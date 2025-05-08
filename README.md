@@ -1,0 +1,1 @@
+# ProjectWork_AEQUITAS_AKKODIS
