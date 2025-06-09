@@ -1,0 +1,18 @@
+1. DATA CLEANING
+2. DATA LOADING & UNDERSTANDING
+      2.1 Feature Selection
+            - stats per feature: missing values, min, max, mean, std, 1st_percentile, 2nd_percentile, 3rd_percentile, type, (distinct) values, distribution
+            - selezione le possibili feature sensibili e la/le feature target
+      2.2 Proxy Identification
+            - plottare una matrice di correlazione tra le varie feature del dataset
+            - feature proxy = feature correlata (sopra una certa threshold) con una delle feature sensibili
+      2.3 Detection
+            - misuriamo il bias nel dataset (prima di lanciare algoritmi di mitigazione): statistical parity difference e disparate impact (per ogni coppia feature sensibile - feature target, calcoliamo la metrica per ogni coppia gruppo sensibile - classe possibile)
+3. TRAINING AND TESTING:
+      - plot comuni:
+            - Performance column bar-plot con 2 subplot (cross-validation mean +- std no mitigation, with mitigation); metriche performance: accuracy, precision, recall, f1, auc
+            - Fairness  column bar-plot con 2 subplot (cross-validation mean +- std no mitigation, with mitigation); metriche fairness: demographic parity e equalized odds ratio
+      3.1 PRE-PROCESSING
+            - coordinate plot del dataset originale vs trasformato
+      3.2 IN-PROCESSING
+      3.3 POST-PROCESSING

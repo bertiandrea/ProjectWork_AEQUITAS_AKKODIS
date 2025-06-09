@@ -4,6 +4,10 @@ Fairness Pipeline Documentation
 1. Data Cleaning
 ----------------
 
+Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non desiderate, e applichiamo il remapping definito nel file di configurazione.
+
+**Lettura e pulizia iniziale del dataset**
+
 .. code-block:: python
 
     PATH = 'C:/Users/andre/Desktop/ProjectWork_AEQUITAS_AKKODIS/'
@@ -11,9 +15,7 @@ Fairness Pipeline Documentation
         pd.read_excel(PATH + 'data/Dataset_2.0_Akkodis.xlsx')
             .rename(columns=lambda c: c.lstrip().title())
     )
-
     df = df.drop_duplicates(subset='Id', keep='last')
-
     df = df.drop(columns=config['drop_columns'])
 
     for col, remove_list in config['drop_rows'].items():
@@ -22,13 +24,15 @@ Fairness Pipeline Documentation
     for col, mapping in config['remap_rows'].items():
         df[col] = df[col].replace(mapping)
 
+**Rimozione colonne con troppi valori nulli e riempimento con valori di default**
+
 .. code-block:: python
 
     unuseful_columns = []
     for col in df.columns:
         null_count = df[col].isna().sum() / df.shape[0]
-        if null_count > (float(config['drop_nan_columns_threshold'])/100):
-        unuseful_columns.append(col)
+        if null_count > (float(config['drop_nan_columns_threshold']) / 100):
+            unuseful_columns.append(col)
     df = df.drop(columns=unuseful_columns)
 
     for col, filler in config['fill_nan_columns'].items():
@@ -37,6 +41,8 @@ Fairness Pipeline Documentation
             df[col].fillna(media, inplace=True)
         else:
             df[col].fillna(filler, inplace=True)
+
+**Remapping della feature Residence tramite liste configurabili**
 
 .. code-block:: python
 
@@ -47,7 +53,7 @@ Fairness Pipeline Documentation
             items = [
                 x for x in base
                 if not any(exc in x for exc in p.get('exc', []))
-                    and (any(inc in x for inc in p.get('inc', [])) if 'inc' in p else True)
+                   and (any(inc in x for inc in p.get('inc', [])) if 'inc' in p else True)
             ]
             for key in ('split', 'post'):
                 if key in p:
@@ -70,12 +76,15 @@ Fairness Pipeline Documentation
             df[col_name] = df[col_cfg['src']].apply(lambda v, cfg=col_cfg: apply_field(v, cfg, lists, feat_cfg))
         df = df.drop(columns=feature, errors='ignore')
 
+**Creazione colonna "Status" binaria**
+
 .. code-block:: python
 
     mask = np.zeros(len(df), dtype=bool)
     for col, valid_values in config['status_positive_conditions'].items():
         mask |= df[col].isin(valid_values)
     df['Status'] = np.where(mask, 'Positive', 'Negative')
+
 
 2. Data Loading & Understanding
 -------------------------------
@@ -101,65 +110,71 @@ Fairness Pipeline Documentation
         labels = config['categorical_columns_custom_orders'].get(lookup, distrib.keys())
         counts = [distrib[label] for label in labels]
         distrib_df = pd.DataFrame({lookup: labels, 'Count': counts})
+        plt.figure(figsize=(8, 5))
         distrib_df.head(20).plot(x=lookup, y='Count', kind='bar', legend=False)
         plt.title(lookup)
 
-Inoltre:
-    - Identificazione delle **feature sensibili** (es. genere, etnia, età)
-    - Definizione della **feature target** (es. assunto/sì-no)
-
 .. code-block:: python
 
-    for snstv_col in config['visualize_distributions_columns_by_feature']:
+    for snstv_col in config['sensitive_columns']:
         order = config['categorical_columns_custom_orders'].get(snstv_col)
 
-        pivot = df.pivot_table(
-            index=snstv_col,
-            columns='Status',
-            aggfunc='size',
-            fill_value=0
+        plt.figure(figsize=(8, 5))
+        sns.barplot(
+            data=df,
+            x=snstv_col,
+            y=(df['Status'] == 'Positive').astype(float),
+            estimator=np.mean,
+            order=order,
+            hue=snstv_col,
+            palette='Set2'
         )
-        if order:
-            pivot = pivot.reindex(order)
-        pivot_pct = pivot.div(pivot.sum(axis=1), axis=0)
-        pivot_pct.plot(kind='bar', stacked=True, figsize=(10, 6))
-        plt.title(f"Distribution of Status by {snstv_col} (Normalized)")
+        plt.title(f"Status Positive Rate by {snstv_col}", fontsize=14)
         plt.xticks(rotation=45)
-        plt.legend(title='Status', loc='upper left')
 
         df_plot = df.copy()
         if order:
             df_plot[snstv_col] = pd.Categorical(df_plot[snstv_col], categories=order, ordered=True)
-        plt.figure(figsize=(10, 6))
+        
+        plt.figure(figsize=(8, 5))
         sns.histplot(
             data=df_plot,
             x=snstv_col,
             hue="Status",
             multiple="stack",
-            palette="Set3",
-            shrink=0.9,
+            palette="Set2",
+            shrink=0.8
         )
         plt.title(f"Distribution of Status by {snstv_col}", fontsize=14)
         plt.xticks(rotation=45)
 
-.. code-block:: python
+**Identificazione delle Feature Sensibili**
+Nel contesto dell’equità algoritmica, è fondamentale identificare correttamente le feature sensibili, ovvero quelle variabili che rappresentano caratteristiche protette degli individui e che, se utilizzate impropriamente, possono introdurre o amplificare bias discriminatori.
+In questo progetto, le feature sensibili sono state individuate sulla base di criteri normativi (es. GDPR) e rilevanza sociale.
+Sono state considerate sensibili le variabili che descrivono aspetti come il genere, la cittadinanza, la residenza e altre caratteristiche personali potenzialmente soggette a disparità di trattamento.
+La selezione è stata effettuata analizzando le distribuzioni di tali feature e verificandone l’impatto sui tassi di assunzione.
 
-    for snstv_col in config['visualize_distributions_columns_by_status']:
-        order = config['categorical_columns_custom_orders'].get(snstv_col)
+    - **1. Gender (Sex)**
+    Females are hired at a significantly higher rate than males, suggesting a possible organizational emphasis on gender diversity or a potential bias favoring female candidates.
 
-        df_plot = df.copy()
-        if order:
-            df_plot[snstv_col] = pd.Categorical(df_plot[snstv_col], categories=order, ordered=True)
-        plt.figure(figsize=(8, 5))
-        sns.boxplot(
-            data=df_plot,
-            x="Status",
-            y=snstv_col,
-            palette="Set3",
-            hue="Status",
-        )
-        plt.title(f"{snstv_col} distribution by Status", fontsize=14)
-        plt.xticks(rotation=45)
+    - **2. Age Range**
+    Hiring rates increase with age, peaking between 31–45 years, indicating a clear preference for mid-career professionals with more experience. Younger candidates, especially under 26, face notably lower hiring chances.
+
+    - **3. European Residence**
+    Candidates residing in Europe are far more likely to be hired, which may reflect logistical preferences, legal work eligibility, or alignment with company locations and operations.
+
+    - **4. Italian Residence**
+    There is a strong hiring bias toward candidates living in Italy. This suggests the organization prefers local hires, potentially to reduce relocation costs or due to legal/employment constraints.
+
+    - **5. Protected Category**
+    No meaningful difference in hiring rates between protected and non-protected groups was found. However, due to the very small sample of protected category candidates, no reliable conclusion can be drawn.
+
+**Definizione della Feature Target**
+La feature target è la variabile che il modello ha il compito di predire.
+In questo caso, essa rappresenta l'esito di un processo decisionale, ovvero lo stato di assunzione del candidato.
+Tuttavia, il dataset originale non contiene una colonna esplicita binaria per questo scopo.
+Pertanto, è stata costruita una variabile target denominata Status, derivata da una combinazione logica di due colonne esistenti: Candidate State ed Event_Feedback.
+Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il modello di classificazione rispetti criteri di equità nel processo decisionale relativo all’assunzione dei candidati.
 
 2.2 Proxy Identification
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -178,22 +193,45 @@ Inoltre:
     num_cols = [col for col, t in columns_type.items() if t == 'num']
     df_num = df[num_cols].copy()
 
-    plt.figure(figsize=(18, 12))
-    sns.heatmap(df_num.corr().round(2), annot=True, cmap='coolwarm', center=0, linewidths=.5)
+    ordered_categorical_columns = [
+        col for col in df.columns if col in config['categorical_columns_custom_orders']
+    ]
+
+    df_cat = df[ordered_categorical_columns].copy()
+
+    for col in ordered_categorical_columns:
+        order = config['categorical_columns_custom_orders'][col]
+        df_cat[col] = pd.Categorical(df_cat[col], categories=order, ordered=True)
+
+    df_cat_encoded = df_cat.apply(lambda x: x.cat.codes)
+
+    df_corr = pd.concat([df_num, df_cat_encoded], axis=1)
+
+    plt.figure(figsize=(16, 10))
+    sns.heatmap(df_corr.corr().round(2), annot=True, cmap='coolwarm', center=0, linewidths=.5)
+    plt.title("Correlation Matrix of Numerical and Ordered Categorical Features")
 
 .. code-block:: python
 
-    for col in [col for col, t in columns_type.items() if t == 'cat']:
-        if col == 'Status':
-            continue  # Skip Status as it is already handled separately
+    corr_matrix = df_corr.corr().abs()
 
-        order = config['categorical_columns_custom_orders'].get(col)
+    # Create a mask to get the upper triangle (excluding the diagonal)
+    upper_triangle_mask = np.triu(np.ones_like(corr_matrix, dtype=bool), k=1)
+    upper_triangle = corr_matrix.where(upper_triangle_mask)
+    corr_pairs = upper_triangle.stack()
 
-        contingency = pd.crosstab(df[col], df['Status'])
-        
+    high_corr_pairs = corr_pairs[corr_pairs > config['correlation_threshold']].sort_values(ascending=False)
+
+    print("Variable pairs with correlation above the threshold:")
+    print(high_corr_pairs)
+
+.. code-block:: python
+
+    def compute(col1, col2):
+        order = config['categorical_columns_custom_orders'].get(col1, None)
+        contingency = pd.crosstab(df[col1], df[col2])
         if order:
             contingency = contingency.reindex(index=order)
-        
         chi2, p, dof, expected = chi2_contingency(contingency, correction=False)
         test_name = 'Chi-squared'
         if contingency.shape == (2, 2) and (expected < 5).any():
@@ -202,17 +240,25 @@ Inoltre:
         n = contingency.values.sum()
         k = min(contingency.shape)
         cramer_v = np.sqrt(chi2 / (n * (k - 1)))
-        
-        if p < 0.05:
-            print(f"--- {col} ---")
-            print("Actual frequencies:")
-            print(contingency)
-            print()
-            print("Expected frequencies:")
-            print(pd.DataFrame(expected, index=contingency.index, columns=contingency.columns))
-            print()
+
+        return contingency, expected, chi2, p, dof, cramer_v, test_name
+
+    cats = [col for col, t in columns_type.items() if t == 'cat']
+    for col1, col2 in combinations(cats, 2):
+        if col1 == col2:
+            continue
+         
+        contingency, expected, chi2, p, dof, cramer_v, test_name = compute(col1, col2)
+
+        if p < config['chi_squared_p_value_threshold'] and cramer_v >= config['cramers_v_threshold']:
+            print(f"--- {col1} vs {col2} ---")
+            #print("Actual frequencies:")
+            #print(contingency)
+            #print()
+            #print("Expected frequencies:")
+            #print(pd.DataFrame(expected, index=contingency.index, columns=contingency.columns))
+            #print()
             print(f"{test_name} test: χ² = {chi2:.2f}, p = {p:.3f}, dof = {dof}, Cramér’s V = {cramer_v:.3f}")
-            print("Conclusion: Significant association (Dependent)")
             print()
 
 2.3 Bias Detection
@@ -222,11 +268,12 @@ Inoltre:
 
     def compute_bias_metrics(df, sensitive_column, target_column):
         y_true = (df[target_column] == 'Positive').astype(int)
+        y_pred = y_true  # Measuring bias in the true labels
         s_attr = df[sensitive_column]
 
-        dpd = demographic_parity_difference(y_true, y_true, sensitive_features=s_attr)
+        dpd = demographic_parity_difference(y_true, y_pred, sensitive_features=s_attr)
 
-        mf = MetricFrame(metrics=selection_rate, y_true=y_true, y_pred=y_true, sensitive_features=s_attr)
+        mf = MetricFrame(metrics=selection_rate, y_true=y_true, y_pred=y_pred, sensitive_features=s_attr)
         sr_by_group = mf.by_group
         di = sr_by_group.min() / sr_by_group.max()
 
@@ -273,6 +320,77 @@ Inoltre:
 
     X_test_cr = cr.transform(test_df)
     X_test_cr_df = pd.DataFrame(X_test_cr)
+
+- **Coordinate Plot - Original Vs Transformed Dataset**
+
+.. code-block:: python
+
+    X_orig_df = X_train_split.copy()
+    X_orig_df.drop(columns=sensitive, inplace=True)
+    X_trans_df = X_train_cr_df.copy()
+
+    scaler = MinMaxScaler()
+    X_orig_df_scaled = pd.DataFrame(
+        scaler.fit_transform(X_orig_df),
+        columns=X_orig_df.columns,
+        index=X_orig_df.index
+    )
+    X_trans_df_scaled = pd.DataFrame(
+        scaler.fit_transform(X_trans_df),
+        columns=X_trans_df.columns,
+        index=X_trans_df.index
+    )
+
+    X_trans_df_scaled.columns = X_orig_df_scaled.columns
+    X_orig_df_scaled['version'] = 'Original'
+    X_trans_df_scaled['version'] = 'Transformed'
+
+    df_combined_scaled = pd.concat(
+        [X_orig_df_scaled, X_trans_df_scaled],
+        ignore_index=True
+    )
+
+    plt.figure(figsize=(16, 10))
+    parallel_coordinates(
+        df_combined_scaled,
+        class_column='version',
+        cols=list(X_orig_df.columns),
+        color=['red', 'blue'],
+        alpha=0.3,
+        linewidth=0.7
+    )
+
+    plt.title("Parallel Coordinates (scaled) – Original vs Transformed")
+    plt.xticks(rotation=45, ha='right')
+    plt.ylabel("Scaled feature value [0–1]")
+    plt.grid(axis='y', linestyle='--', linewidth=0.5)
+
+.. code-block:: python
+    
+    X_orig_df = X_train_split.copy()
+    X_orig_df.drop(columns=sensitive, inplace=True)
+    X_trans_df = X_train_cr_df.copy()
+
+    X_trans_df.columns = X_orig_df.columns  # Ensure same columns for comparison
+    X_orig_df['version'] = 'Original'
+    X_trans_df['version'] = 'Transformed'
+
+    df_combined = pd.concat([X_orig_df, X_trans_df], ignore_index=True)
+
+    plt.figure(figsize=(16, 10))
+    parallel_coordinates(
+        df_combined,
+        class_column='version',
+        cols= df_combined.columns[:-1],  # Exclude 'version' column
+        color=['red', 'blue'],      # Original→red, Transformed→blue
+        alpha=0.3,                  # transparency to see overlap
+        linewidth=0.7
+    )
+
+    plt.title("Parallel Coordinates – Original vs Transformed")
+    plt.xticks(rotation=45, ha='right')
+    plt.ylabel("Feature value")
+    plt.grid(axis='y', linestyle='--', linewidth=0.5)  # light horizontal grid
 
 .. code-block:: python
 
