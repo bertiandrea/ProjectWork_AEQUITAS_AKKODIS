@@ -10,13 +10,13 @@ Il dataset dell’azienda, precedentemente anonimizzato, presenta più righe per
 
 - **ID**: Identificatore univoco.
 - **Candidate State**: Stato del candidato:
-   - **Imported**: Candidati importati da database esterni (es. AlmaLaurea). Alcuni potrebbero non aver mai risposto ad Akkodis. `Event_Type__Val = CV Request` indica che il recruiter non ha ancora ricevuto il curriculum.
-   - **First contact**: Primi contatti (normalmente telefonici). Alcuni potrebbero aver interrotto i contatti o avere un curriculum inadeguato (`Event_Feedback = Inadequate CV`).
-   - **In selection**: Candidati in fase di selezione, sottoposti ai primi colloqui per una posizione lavorativa.
-   - **QM**: Candidati sottoposti a Qualification Meeting.
-   - **Economic Proposal**: Candidati che hanno ricevuto una proposta economica.
-   - **Vivier**: Candidati con competenze non allineate ai requisiti ma valide per opportunità future.
-   - **Hired**: Candidato assunto dall’azienda cliente.
+    - **Imported**: Candidati importati da database esterni (es. AlmaLaurea). Alcuni potrebbero non aver mai risposto ad Akkodis. `Event_Type__Val = CV Request` indica che il recruiter non ha ancora ricevuto il curriculum.
+    - **First contact**: Primi contatti (normalmente telefonici). Alcuni potrebbero aver interrotto i contatti o avere un curriculum inadeguato (`Event_Feedback = Inadequate CV`).
+    - **In selection**: Candidati in fase di selezione, sottoposti ai primi colloqui per una posizione lavorativa.
+    - **QM**: Candidati sottoposti a Qualification Meeting.
+    - **Economic Proposal**: Candidati che hanno ricevuto una proposta economica.
+    - **Vivier**: Candidati con competenze non allineate ai requisiti ma valide per opportunità future.
+    - **Hired**: Candidato assunto dall’azienda cliente.
 - **Age Range**: Range di età del candidato: [< 20], [20 – 25], [26 – 30], [31 – 35], [36 – 40], [40 – 45], [> 45] 
 - **Residence**: Residenza attuale.
 - **Sex**: Sesso del candidato (Male | Female, default: Male).
@@ -24,13 +24,13 @@ Il dataset dell’azienda, precedentemente anonimizzato, presenta più righe per
 - **TAG**: Parole chiave utilizzate dal recruiter.
 - **Study Area**: Disciplina accademica di studio.
 - **Study Title**: Titolo accademico:
-  - Middle school diploma
-  - Professional qualification
-  - High school graduation
-  - Three-year degree
-  - Five-year degree
-  - Master’s degree
-  - Doctorate
+    - Middle school diploma
+    - Professional qualification
+    - High school graduation
+    - Three-year degree
+    - Five-year degree
+    - Master’s degree
+    - Doctorate
 - **Years Experience**: Range di anni di esperienza: [0], [0-1], [1-3], [3-5], [5-7], [7-10], [+10] 
 - **Sector**: Settore di esperienza.
 - **Last Role**: Ultimo ruolo lavorativo o di studio.
@@ -44,19 +44,19 @@ Il dataset dell’azienda, precedentemente anonimizzato, presenta più righe per
 Sono relativi ad uno specifico stadio e cambiano per uno stesso candidato man mano che va avanti nel processo di recruiting.
 
 - **Event_Type__Val**: Tipo di evento/stadio del processo:
-   - **Iniziali**: Commercial note, CV Request, Contact note, Research Association.
-   - **Centrali**: HR interview, BM interview, Technical interview, Qualification Meeting.
-   - **Finali**: Candidate notification, Sending SC to customer, Economic proposal, Notify candidate, Inadequate CV.
+    - **Iniziali**: Commercial note, CV Request, Contact note, Research Association.
+    - **Centrali**: HR interview, BM interview, Technical interview, Qualification Meeting.
+    - **Finali**: Candidate notification, Sending SC to customer, Economic proposal, Notify candidate, Inadequate CV.
 - **Event_Feedback**: Feedback associato all’evento (OK o KO, con eventuali commenti).
 - **Overall**: Punteggio del colloquio (solo per eventi centrali).
 - **Akkodis Headquarters**: Sede di Akkodis che gestisce il candidato.
 - Punteggi assegnati dal recruiter (1–4) durante il colloquio:
-  - **Technical Skills**
-  - **Standing/Position**
-  - **Communication**
-  - **Dynamism**
-  - **Mobility**
-  - **English**
+    - **Technical Skills**
+    - **Standing/Position**
+    - **Communication**
+    - **Dynamism**
+    - **Mobility**
+    - **English**
 
 **ATTRIBUTI della POSIZIONE LAVORATIVA:** 
 
@@ -157,8 +157,10 @@ Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non deside
 L’obiettivo del progetto è lo sviluppo di modelli di AI da impiegare nelle fasi preliminari del processo di recruiting per analizzare i bias emergenti. La scelta del target è stata influenzata dalla struttura del dataset, che contiene informazioni sui candidati e sulle posizioni gestite da Akkodis.
 In base ai dati disponibili, sono stati identificati due possibili obiettivi di predizione automatica:
 
-- RAL: Predire la RAL più adeguata al profilo del candidato.
-- Hired: Etichettare la coppia candidato-posizione come positiva o negativa, definendo se il profilo del candidato sia adeguato alle richieste aziendali.
+- **RAL**
+    Predire la RAL più adeguata al profilo del candidato.
+- **Hired**
+    Etichettare la coppia candidato-posizione come positiva o negativa, definendo se il profilo del candidato sia adeguato alle richieste aziendali.
 
 La prima ipotesi è stata scartata poiché oltre il 90% dei candidati non presenta valori per i campi relativi alla RAL.
 Per distinguere tra candidati idonei e non idonei, è necessario definire una variabile target esplicita. Il dataset originale non contiene una colonna binaria per questo scopo. Pertanto è stata creata la variabile Status, derivata logicamente dalle colonne Candidate State ed Event_Feedback.
@@ -187,14 +189,71 @@ Questa scelta è coerente con l’obiettivo di valutare se i modelli di classifi
     stats['type'] = df.dtypes
     stats['distinct_values'] = df.nunique()
 
-    for lookup in config['visualize_columns']:
+.. code-block:: text
+
+    | Column             | missing_values | min | max |     mean |      std | 1st_percentile | 2nd_percentile | 3rd_percentile |    type | distinct_values |
+    | ------------------ | -------------: | --: | --: | -------: | -------: | -------------: | -------------: | -------------: | ------: | --------------: |
+    | Candidate State    |              0 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |               5 |
+    | Age Range          |              0 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |               7 |
+    | Sex                |              0 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |               2 |
+    | Protected Category |              0 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |               2 |
+    | Study Area         |              0 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |              10 |
+    | Study Title        |              0 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |               7 |
+    | Years Experience   |              0 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |               7 |
+    | Sector             |            217 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |              14 |
+    | Job Family Hiring  |          2 137 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |               7 |
+    | Job Title Hiring   |          2 137 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |              18 |
+    | Event\_Feedback    |            932 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |              15 |
+    | Overall            |            964 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |               8 |
+    | Minimum Ral        |          2 373 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |              15 |
+    | Ral Maximum        |          2 310 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |              17 |
+    | Study Level        |          2 198 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |               7 |
+    | Current Ral        |          1 660 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |              18 |
+    | Expected Ral       |          1 668 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |              18 |
+    | Technical Skills   |            972 | 1.0 | 4.0 | 2.139130 | 0.648580 |            2.0 |            2.0 |            3.0 | float64 |               4 |
+    | Comunication       |            972 | 1.0 | 4.0 | 2.274534 | 0.617064 |            2.0 |            2.0 |            3.0 | float64 |               4 |
+    | Maturity           |            969 | 1.0 | 4.0 | 2.262244 | 0.600904 |            2.0 |            2.0 |            3.0 | float64 |               4 |
+    | Dynamism           |            969 | 1.0 | 4.0 | 2.260384 | 0.602228 |            2.0 |            2.0 |            3.0 | float64 |               4 |
+    | Mobility           |            968 | 1.0 | 4.0 | 2.163569 | 0.823108 |            2.0 |            2.0 |            3.0 | float64 |               4 |
+    | English            |            972 | 1.0 | 4.0 | 2.759006 | 0.543047 |            3.0 |            3.0 |            3.0 | float64 |               4 |
+    | Residence City     |              0 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |             741 |
+    | Residence Province |              0 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |             112 |
+    | Residence Region   |              0 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |              21 |
+    | Residence State    |              0 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |              33 |
+    | European Residence |              0 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |               2 |
+    | Italian Residence  |              0 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |               2 |
+    | Status             |              0 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |               2 |
+
+.. code-block:: python
+
+    cols = 2  # numero di colonne nella griglia
+    n = len(config['visualize_columns'])
+    rows = math.ceil(n / cols)
+
+    fig, axes = plt.subplots(rows, cols, figsize=(cols*6, rows*4), constrained_layout=True)
+    axes = axes.flatten()
+    for i, lookup in enumerate(config['visualize_columns']):
+        ax = axes[i]
+
         distrib = Counter(df[lookup])
-        labels = config['categorical_columns_custom_orders'].get(lookup, distrib.keys())
+        labels = config['categorical_columns_custom_orders'].get(lookup, list(distrib.keys()))
         counts = [distrib[label] for label in labels]
         distrib_df = pd.DataFrame({lookup: labels, 'Count': counts})
-        plt.figure(figsize=(8, 5))
-        distrib_df.head(20).plot(x=lookup, y='Count', kind='bar', legend=False)
-        plt.title(lookup)
+
+        distrib_df.plot(
+            x=lookup,
+            y='Count',
+            kind='bar',
+            legend=False,
+            ax=ax
+        )
+        ax.set_title(lookup)
+        ax.tick_params(axis='x', rotation=45)  # se vuoi ruotare le etichette
+
+    for j in range(i+1, len(axes)):
+        axes[j].axis('off')
+
+    plt.show()
 
 **Sensitive Feature Selection**
 
@@ -215,10 +274,39 @@ Il passo successivo consisterà nell’integrare queste valutazioni all’intern
 
 .. code-block:: python
 
-    for snstv_col in config['sensitive_columns']:
-        order = config['categorical_columns_custom_orders'].get(snstv_col)
+    cols = 2  # numero di colonne nella griglia
+    n = len(config['sensitive_columns'])
+    total_plots = n * 2
+    rows = math.ceil(total_plots / cols)
 
-        plt.figure(figsize=(8, 5))
+    fig, axes = plt.subplots(rows, cols, figsize=(cols*6, rows*4), constrained_layout=True)
+    axes = axes.flatten()
+    for i, snstv_col in enumerate(config['sensitive_columns']):
+        order = config['categorical_columns_custom_orders'].get(snstv_col, None)
+
+        df_plot = df.copy()
+        if order:
+            df_plot[snstv_col] = pd.Categorical(
+                df_plot[snstv_col],
+                categories=order,
+                ordered=True
+            )
+
+        ax_hist = axes[2 * i + 1]
+        sns.histplot(
+            data=df_plot,
+            x=snstv_col,
+            hue="Status",
+            multiple="stack",
+            palette="Set2",
+            shrink=0.8,
+            ax=ax_hist
+        )
+        ax_hist.set_title(f"Distribution of Status by {snstv_col}", fontsize=14)
+        ax_hist.tick_params(axis='x', rotation=45)
+
+        
+        ax_bar = axes[2 * i]
         sns.barplot(
             data=df,
             x=snstv_col,
@@ -226,26 +314,16 @@ Il passo successivo consisterà nell’integrare queste valutazioni all’intern
             estimator=np.mean,
             order=order,
             hue=snstv_col,
-            palette='Set2'
+            palette='Set2',
+            ax=ax_bar
         )
-        plt.title(f"Status Positive Rate by {snstv_col}", fontsize=14)
-        plt.xticks(rotation=45)
+        ax_bar.set_title(f"Positive Rate by {snstv_col}", fontsize=14)
+        ax_bar.tick_params(axis='x', rotation=45)
 
-        df_plot = df.copy()
-        if order:
-            df_plot[snstv_col] = pd.Categorical(df_plot[snstv_col], categories=order, ordered=True)
-        
-        plt.figure(figsize=(8, 5))
-        sns.histplot(
-            data=df_plot,
-            x=snstv_col,
-            hue="Status",
-            multiple="stack",
-            palette="Set2",
-            shrink=0.8
-        )
-        plt.title(f"Distribution of Status by {snstv_col}", fontsize=14)
-        plt.xticks(rotation=45)
+    for j in range(2 * n, len(axes)):
+        axes[j].axis('off')
+
+    plt.show()
 
 2.2 Proxy Identification
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -256,12 +334,6 @@ Per evidenziare le relazioni tra le colonne del dataset e ottenere una rappresen
 
 .. code-block:: python
 
-    plt.figure(figsize=(16, 10))
-    sns.heatmap(df.corr().round(2), annot=True, cmap='coolwarm', center=0, linewidths=.5)
-    plt.title("Correlation Matrix of Numerical and Ordered Categorical Features")
-
-.. code-block:: python
-
     columns_type = {}
     for col in df.columns:
         if pd.api.types.is_string_dtype(df[col]):
@@ -269,22 +341,39 @@ Per evidenziare le relazioni tra le colonne del dataset e ottenere una rappresen
         elif pd.api.types.is_numeric_dtype(df[col]):
             columns_type[col] = 'num'
 
+    encoding_mappings = {}
+    df_corr = pd.DataFrame(index=df.index)
+    for col, t in columns_type.items():
+        if t == 'cat':
+            if col in config['categorical_columns_custom_orders']:
+                ordered = config['categorical_columns_custom_orders'][col]
+                df_corr[col] = pd.Categorical(df[col], categories=ordered, ordered=True).codes
+                encoding_mappings[col] = {cat: i for i, cat in enumerate(ordered)}
+            else:
+                encoder = LabelEncoder()
+                df_corr[col] = encoder.fit_transform(df[col].astype(str))
+                encoding_mappings[col] = dict(zip(encoder.classes_, encoder.transform(encoder.classes_)))
+        else:
+            df_corr[col] = df[col]
+
+    plt.figure(figsize=(16, 10))
+    sns.heatmap(df_corr.corr().round(2), annot=True, cmap='coolwarm', center=0, linewidths=.5)
+    plt.title("Correlation Matrix")
+
 .. code-block:: python
 
-    num_cols = [col for col, t in columns_type.items() if t == 'num']
-    df_num = df[num_cols].copy()
+    df_num = df.select_dtypes(include='number')
 
-    ordered_categorical_columns = [
-        col for col in df.columns if col in config['categorical_columns_custom_orders']
-    ]
+    cat_cols = list(config['categorical_columns_custom_orders'].keys())
 
-    df_cat = df[ordered_categorical_columns].copy()
-
-    for col in ordered_categorical_columns:
-        order = config['categorical_columns_custom_orders'][col]
-        df_cat[col] = pd.Categorical(df_cat[col], categories=order, ordered=True)
-
-    df_cat_encoded = df_cat.apply(lambda x: x.cat.codes)
+    df_cat_encoded = pd.DataFrame(
+        { col: pd.Categorical(df[col],
+                            categories=config['categorical_columns_custom_orders'][col],
+                            ordered=True
+                            ).codes
+        for col in cat_cols },
+        index=df.index
+    )
 
     df_corr = pd.concat([df_num, df_cat_encoded], axis=1)
 
@@ -306,11 +395,27 @@ Per evidenziare le relazioni tra le colonne del dataset e ottenere una rappresen
     print("Variable pairs with correlation above the threshold:")
     print(high_corr_pairs)
 
+.. code-block:: text
+
+    Variable pairs with correlation above the threshold:
+    Ral Maximum      Minimum Ral     0.839071
+    Candidate State  Study Level     0.822850
+    Current Ral      Expected Ral    0.818242
+    Study Level      Ral Maximum     0.736592
+    dtype: float64
+
 **Chi-squared Test Analysis**
 
-Per identificare le variabili categoriche che potrebbero essere considerate proxy per le feature sensibili, è stata effettuata un’analisi basata sul test del chi-quadrato.
+Per identificare le variabili categoriche che potrebbero essere considerate proxy per le feature sensibili, è stata effettuata un’analisi basata sul test del chi-squared.
 
 .. code-block:: python
+
+    columns_type = {}
+    for col in df.columns:
+        if pd.api.types.is_string_dtype(df[col]):
+            columns_type[col] = 'cat'
+        elif pd.api.types.is_numeric_dtype(df[col]):
+            columns_type[col] = 'num'
 
     def compute(col1, col2):
         order = config['categorical_columns_custom_orders'].get(col1, None)
@@ -346,34 +451,133 @@ Per identificare le variabili categoriche che potrebbero essere considerate prox
             print(f"{test_name} test: χ² = {chi2:.2f}, p = {p:.3f}, dof = {dof}, Cramér’s V = {cramer_v:.3f}")
             print()
 
+.. code-block:: text
+
+    --- Age Range vs Years Experience ---
+    Chi-squared test: χ² = 2092.78, p = 0.000, dof = 36, Cramér’s V = 0.368
+
+    --- Age Range vs Residence City ---
+    Chi-squared test: χ² = 4873.20, p = 0.000, dof = 4440, Cramér’s V = 0.561
+
+    --- Age Range vs Residence Province ---
+    Chi-squared test: χ² = 1096.28, p = 0.000, dof = 666, Cramér’s V = 0.266
+
+    --- Age Range vs Italian Residence ---
+    Chi-squared test: χ² = 210.25, p = 0.000, dof = 6, Cramér’s V = 0.285
+
+    --- Sex vs Study Area ---
+    Chi-squared test: χ² = 214.75, p = 0.000, dof = 9, Cramér’s V = 0.288
+
+    --- Study Area vs Study Title ---
+    Chi-squared test: χ² = 1632.05, p = 0.000, dof = 54, Cramér’s V = 0.325
+
+    --- Study Area vs Residence Province ---
+    Chi-squared test: χ² = 1500.14, p = 0.000, dof = 999, Cramér’s V = 0.254
+
+    --- Study Title vs Residence City ---
+    Chi-squared test: χ² = 4828.69, p = 0.000, dof = 4440, Cramér’s V = 0.558
+
+    --- Study Title vs Residence Province ---
+    Chi-squared test: χ² = 991.30, p = 0.000, dof = 666, Cramér’s V = 0.253
+
+    --- Years Experience vs Residence Province ---
+    Chi-squared test: χ² = 965.34, p = 0.000, dof = 666, Cramér’s V = 0.250
+
+    --- Years Experience vs Italian Residence ---
+    Chi-squared test: χ² = 136.43, p = 0.000, dof = 6, Cramér’s V = 0.230
+
+    --- Residence City vs Residence Province ---
+    Chi-squared test: χ² = 258052.16, p = 0.000, dof = 82140, Cramér’s V = 0.949
+
+    --- Residence City vs Residence Region ---
+    Chi-squared test: χ² = 48702.01, p = 0.000, dof = 14800, Cramér’s V = 0.971
+
+    --- Residence City vs European Residence ---
+    Chi-squared test: χ² = 857.41, p = 0.002, dof = 740, Cramér’s V = 0.576
+
+    --- Residence City vs Italian Residence ---
+    Chi-squared test: χ² = 2409.92, p = 0.000, dof = 740, Cramér’s V = 0.966
+
+    --- Residence Province vs Residence Region ---
+    Chi-squared test: χ² = 51640.00, p = 0.000, dof = 2220, Cramér’s V = 1.000
+
+    --- Residence Province vs European Residence ---
+    Chi-squared test: χ² = 761.27, p = 0.000, dof = 111, Cramér’s V = 0.543
+
+    --- Residence Province vs Italian Residence ---
+    Chi-squared test: χ² = 2392.69, p = 0.000, dof = 111, Cramér’s V = 0.963
+
+    --- Residence Region vs Residence State ---
+    Chi-squared test: χ² = 2392.69, p = 0.000, dof = 640, Cramér’s V = 0.215
+
+    --- Residence Region vs European Residence ---
+    Chi-squared test: χ² = 761.27, p = 0.000, dof = 20, Cramér’s V = 0.543
+
+    --- Residence Region vs Italian Residence ---
+    Chi-squared test: χ² = 2392.69, p = 0.000, dof = 20, Cramér’s V = 0.963
+
+    --- Residence State vs European Residence ---
+    Chi-squared test: χ² = 2582.00, p = 0.000, dof = 32, Cramér’s V = 1.000
+
+    --- Residence State vs Italian Residence ---
+    Chi-squared test: χ² = 2582.00, p = 0.000, dof = 32, Cramér’s V = 1.000
+
+    --- European Residence vs Italian Residence ---
+    Fisher's exact test: χ² = 821.50, p = 0.000, dof = 1, Cramér’s V = 0.564
+
 2.3 Bias Detection
 ~~~~~~~~~~~~~~~~~~
 Per valutare il livello di Fairness dei modelli addestrati sono state scelte tre metriche: 
 
-- Demographic Parity: Questa metrica richiede che ciascun gruppo abbia le stesse opportunità di essere assegnato alla classe positiva (Hired=1), indipendentemente da veri o falsi positivi. Un modello accurato potrebbe risultare unfair se i sottogruppi nel test set sono sbilanciati rispetto alla variabile target Hired. Ad esempio, se le donne nel dataset hanno un tasso di assunzione più elevato rispetto agli uomini e il test set riflette questa distribuzione, un modello preciso potrebbe comunque violare la demografica pari opportunità. Tuttavia, se tali sbilanciamenti riflettono bias storici, la metrica individua il perpetuarsi di tali bias da parte del modello.
-- Equalized Odds: Questa metrica garantisce che i tassi di True Positive Rate (TPR) e False Positive Rate (FPR) siano costanti tra i diversi gruppi. Significa che il modello dovrebbe classificare erroneamente candidati non idonei come positivi con uguale probabilità per tutte le categorie, evitando di favorire o penalizzare un particolare sottoinsieme.
+- **Demographic Parity**
+    Questa metrica richiede che ciascun gruppo abbia le stesse opportunità di essere assegnato alla classe positiva (Hired=1), indipendentemente da veri o falsi positivi. Un modello accurato potrebbe risultare unfair se i sottogruppi nel test set sono sbilanciati rispetto alla variabile target Hired. Ad esempio, se le donne nel dataset hanno un tasso di assunzione più elevato rispetto agli uomini e il test set riflette questa distribuzione, un modello preciso potrebbe comunque violare la demografica pari opportunità. Tuttavia, se tali sbilanciamenti riflettono bias storici, la metrica individua il perpetuarsi di tali bias da parte del modello.
+- **Equalized Odds**
+    Questa metrica garantisce che i tassi di True Positive Rate (TPR) e False Positive Rate (FPR) siano costanti tra i diversi gruppi. Significa che il modello dovrebbe classificare erroneamente candidati non idonei come positivi con uguale probabilità per tutte le categorie, evitando di favorire o penalizzare un particolare sottoinsieme.
 
 .. code-block:: python
 
-    def compute_bias_metrics(df, sensitive_column, target_column):
-        y_true = (df[target_column] == 'Positive').astype(int)
-        y_pred = y_true  # Measuring bias in the true labels
-        s_attr = df[sensitive_column]
+    cols = 2
+    n = len(config['sensitive_columns'])
+    rows = math.ceil(n / cols)
 
+    fig, axes = plt.subplots(rows, cols, figsize=(cols*6, rows*4), constrained_layout=True)
+    axes = axes.flatten()
+
+    for i, sensitive_attr in enumerate(config['sensitive_columns']):
+        y_true = (df["Status"] == 'Positive').astype(int)
+        y_pred = y_true  # Measuring bias in the true labels
+        s_attr = df[sensitive_attr]
+
+        dpr = demographic_parity_ratio(y_true, y_pred, sensitive_features=s_attr)
         dpd = demographic_parity_difference(y_true, y_pred, sensitive_features=s_attr)
 
-        mf = MetricFrame(metrics=selection_rate, y_true=y_true, y_pred=y_pred, sensitive_features=s_attr)
+        mf = MetricFrame(
+            metrics=selection_rate,
+            y_true=y_true,
+            y_pred=y_pred,
+            sensitive_features=s_attr
+        )
         sr_by_group = mf.by_group
-        di = sr_by_group.min() / sr_by_group.max()
 
-        print(f"\n=== Bias metrics for: {sensitive_column} ===")
-        print(f"Statistical Parity Difference: {dpd:.4f}")
-        print(f"Disparate Impact (min/max rate): {di:.4f}")
-        print("\nSelection Rates by group:")
-        print(sr_by_group)
+        dir = sr_by_group.min() / sr_by_group.max()
+        did = sr_by_group.max() - sr_by_group.min()
 
-    for sensitive_attr in config['sensitive_columns']:
-        compute_bias_metrics(df, sensitive_attr, 'Status')
+        # Plot dei 4 valori
+        metrics = [dpr, dpd, dir, did]
+        labels = ['Statistical Parity Ratio',
+                'Statistical Parity Difference',
+                'Disparate Impact Ratio',
+                'Disparate Impact Difference']
+        
+        ax = axes[i]
+        ax.bar(labels, metrics)
+        ax.set_title(sensitive_attr)
+        ax.tick_params(axis='x', rotation=45)
+
+    for j in range(i+1, len(axes)):
+        axes[j].axis('off')
+
+    plt.show()
 
 3. Training and Testing
 -----------------------
@@ -382,22 +586,20 @@ Per valutare il livello di Fairness dei modelli addestrati sono state scelte tre
 
 .. code-block:: python
 
-    columns_type = {}
-    for col in df.columns:
-        if pd.api.types.is_string_dtype(df[col]):
-            columns_type[col] = 'cat'
-        elif pd.api.types.is_numeric_dtype(df[col]):
-            columns_type[col] = 'num'
-
     encoding_mappings = {}
-    for col in [col for col, t in columns_type.items() if t == 'cat']:
-        if col in config['categorical_columns_custom_orders']:
-            df[col] = pd.Categorical(df[col], categories=config['categorical_columns_custom_orders'][col], ordered=True).codes
-            encoding_mappings[col] = {cat: i for i, cat in enumerate(config['categorical_columns_custom_orders'][col])}
+    df_corr = pd.DataFrame(index=df.index)
+    for col, t in columns_type.items():
+        if t == 'cat':
+            if col in config['categorical_columns_custom_orders']:
+                ordered = config['categorical_columns_custom_orders'][col]
+                df_corr[col] = pd.Categorical(df[col], categories=ordered, ordered=True).codes
+                encoding_mappings[col] = {cat: i for i, cat in enumerate(ordered)}
+            else:
+                encoder = LabelEncoder()
+                df_corr[col] = encoder.fit_transform(df[col].astype(str))
+                encoding_mappings[col] = dict(zip(encoder.classes_, encoder.transform(encoder.classes_)))
         else:
-            encoder = LabelEncoder()
-            df[col] = encoder.fit_transform(df[col].astype(str))
-            encoding_mappings[col] = dict(zip(encoder.classes_, encoder.transform(encoder.classes_)))
+            df_corr[col] = df[col]
 
 **Models**
 
@@ -406,16 +608,16 @@ famiglie  algoritmiche  diverse,  includendo  modelli  lineari,  probabilistici,
 neurali. L’obiettivo è confrontare i risultati e mettere in relazione performance e fairness. 
 I modelli selezionati includono: 
 
-- Modelli Lineari 
+- **Modelli Lineari** 
     - Linear Regression 
     - Logistic Regression 
-- Modelli Probabilistici 
+- **Modelli Probabilistici** 
     - Gaussian Naïve Bayes 
-- Modelli Tree-based 
+- **Modelli Tree-based** 
     - Decision Tree
-- Modelli Distance-based 
+- **Modelli Distance-based** 
     - K-Nearest Neighbors 
-- Rete Neurale
+- **Rete Neurale**
  
 3.1 Pre-processing Mitigation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
