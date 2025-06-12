@@ -1,13 +1,115 @@
 Fairness Pipeline Documentation
 ===============================
+Akkodis  è  un’azienda  globale  che  si  occupa  di  consulenza  e  offre  servizi  di  recruiting  e 
+formazione. Dal 2022 fa parte del gruppo Adecco, leader a livello mondiale nel reclutamento 
+di personale. Questa azienda si distingue nel settore per il suo impegno verso l’inclusività.
 
-1. Data Cleaning
+**Struttura del Dataset** 
+Il  dataset  dell’azienda,  precedentemente  anonimizzato,  presenta  più  righe  per  ciascun 
+candidato memorizzato.  
+Per  ogni  candidato  ciascuna  riga  identifica  un  diverso  step  nel  processo  di  recruiting.  
+Le  colonne  possono  essere  suddivise  in  tre  macrocategorie:  attributi  del  candidato, 
+attributi del processo di recruiting  e  attributi della posizione  lavorativa,  associata  al 
+candidato.
+
+**ATTRIBUTI del CANDIDATO:** 
+- ID: identificatore univoco 
+- Candidate State: stato del candidato 
+    - Imported: candidati importati da database esterni, come per esempio Alma 
+Laurea.  I  candidati  che  mantengono  questo  stato  potrebbero  non  aver  mai 
+risposto  ad  Akkodis.  Alcuni  presentano  l’evento  (Event_Type__Val)  CV 
+Request, che indica che il recruiter non ha ancora ricevuto il curriculum. 
+    - First contact: primi  contatti  con  il  candidato,  normalmente  per  telefono.  I 
+candidati che mantengono questo stato potrebbero aver interrotto i contatti 
+con  Akkodis  o  potrebbero  non  avere  un  curriculum  adeguato 
+(Event_Feedback = Inadequate CV). 
+    - In selection: candidati in fase di selezione, sottoposti ai primi colloqui, per 
+una posizione lavorativa selezionata tra quelle gestite dalla azienda 
+    - QM: candidati sottoposti a Qualification Meeting 
+    - Economic Proposal: candidati che hanno ricevuto una proposta economica 
+da parte della azienda  
+    - Vivier: candidati le cui competenze non sono risultate allineate con i requisiti 
+della posizione per cui sono stati valutati, ma sono ritenute valide da Akkodis 
+per opportunità future. 
+    - Hired il candidato è stato assunto dalla azienda che ha ingaggiato Akkodis 
+- Age  Range:  colonna  categorica  contenente  range  di  età 
+ [< 20], [20 – 25], [26 – 30], [31 – 35], [36 – 40], [40 – 45], [> 45] 
+- Residence: attuale residenza del candidato  
+- Sex: sesso del candidato, ammette due valori (Male | Female) e il valore di default è 
+Male. 
+- Protected  Category:  indica  se  il  candidato  appartiene  alle  categorie  protette, 
+specificando l’articolo di riferimento (articoli 1 e 18). 
+- TAG: parole chiave utilizzate dal recruiter. 
+- Study Area: area di studio, disciplina accademica del candidato. 
+- Study Title: laurea o titolo accademico conseguito 
+    - Middle school diploma 
+    - Professional qualification 
+    - High school graduation 
+    - Three-year degree 
+    - Five-year degree 
+    - Master's degree 
+    - Doctorate 
+- Years  Experience:  range  di  anni  di  esperienza  del  candidato  
+[0], [0-1], [1-3], [3-5], [5-7], [7-10], [+10] 
+- Sector: settore nel quale il candidato ha esperienza. 
+- Last Role: ultimo ruolo lavorativo o di studio del candidato. 
+- Year of Insertion: anno di inserimento del candidato nel database. 
+- Year of Recruitment: anno di assunzione del candidato, presente solo se Candidate 
+State = Hired. 
+- Current Ral: RAL attuale del candidato. 
+- Expected Ral: aspettativa del candidato sulla RAL futura. 
+ 
+**ATTRIBUTI del PROCESSO:** 
+Sono relativi ad uno specifico stadio e cambiano per uno stesso candidato man mano che va 
+avanti nel processo di recruiting. 
+- Event_Type__Val: specifica il tipo di evento, lo stadio del processo di reclutamento. 
+Gli eventi presenti nel database possono essere suddivisi in 3 macrocategorie: 
+    - Eventi  iniziali:  Commercial  note,  CV  Request,  Contact  note,  Research 
+Association 
+    - Eventi  centrali:  HR  interview,  BM  interview,  Technical  interview, 
+Qualification Meeting 
+    - Eventi finali:  Candidate  notification,  Sending  SC  to  customer,  Economic 
+proposal, Notify candidate, Inadequate CV 
+- Event_Feedback: feedback associato ad uno specifico evento (Event_Type__Val), 
+può essere OK o KO, con eventuali commenti specificati tra parentesi. Non tutti i tipi 
+di eventi prevedono un feedback. 
+- Overall:  punteggio  associato  al  colloquio,  presente  solo  per  righe  contenenti 
+Event_Type__Val centrali, associati a colloqui. 
+- Akkodis headquarters: sede di Akkodis che gestisce il candidato. 
+Punteggi assegnati dal recruiter, da 1 a 4, durante il colloquio: 
+- Technical Skills: competenze tecniche. 
+- Standing/Position: posizione all’interno dell’organizzazione. 
+- Communication: competenze comunicative. 
+- Dynamism: livello di dinamicità. 
+- Mobility: mobilità. 
+- English: livello di inglese. 
+
+**ATTRIBUTI della POSIZIONE LAVORATIVA:** 
+Questi campi sono presenti solo se il candidato è stato assunto dalla azienda in questione. 
+- Recruitment Request: richiesta della azienda per un candidato. 
+- Assumption Headquarters: sede della posizione lavorativa. 
+- Job Family Hiring: categoria della posizione lavorativa. 
+- Job Title Hiring: titolo specifico della posizione. 
+- Job Description: descrizione del ruolo. 
+- Candidate Profile: profilo ideale del candidato, richiesto dalla azienda. 
+- Years Experience.1: anni di esperienza richiesti, espressi in range compatibili con 
+il campo Years Experience del candidato. 
+- Minimum Ral: RAL minima prevista. 
+- Ral Maximum: RAL massima prevista. 
+- Study Level:  livello  di  studio  richiesto  per  la  posizione  lavorativa,  i  valori  sono 
+compatibili con il campo Study Title. 
+- Study Area.1: specifica ambito di studio richiesto, contiene compatibili con Study 
+Area. 
+- Linked_search_key:  campo  contenente  un  codice,  non  univoco,  in  formato 
+RSnn.nnnn, nel quale il primo numero a due cifre identifica l’anno di inserimento 
+della posizione lavorativa mentre il numero dopo il punto indica il numero di ricerche 
+effettuate per una specifica posizione. 
+
+1. Pre-processing
 ----------------
-
 Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non desiderate, e applichiamo il remapping definito nel file di configurazione.
 
-**Lettura e pulizia iniziale del dataset**
-
+**Data Cleaning**
 .. code-block:: python
 
     PATH = 'C:/Users/andre/Desktop/ProjectWork_AEQUITAS_AKKODIS/'
@@ -23,8 +125,6 @@ Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non deside
 
     for col, mapping in config['remap_rows'].items():
         df[col] = df[col].replace(mapping)
-
-**Rimozione colonne con troppi valori nulli e riempimento con valori di default**
 
 .. code-block:: python
 
@@ -42,8 +142,7 @@ Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non deside
         else:
             df[col].fillna(filler, inplace=True)
 
-**Remapping della feature Residence tramite liste configurabili**
-
+**Feature Mapping**
 .. code-block:: python
 
     def gen_lists(df, specs):
@@ -76,7 +175,31 @@ Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non deside
             df[col_name] = df[col_cfg['src']].apply(lambda v, cfg=col_cfg: apply_field(v, cfg, lists, feat_cfg))
         df = df.drop(columns=feature, errors='ignore')
 
-**Creazione colonna "Status" binaria**
+2. Data Loading & Understanding
+-------------------------------
+2.1 Feature Selection
+~~~~~~~~~~~~~~~~~~~~~
+**Target Selection**
+L’obiettivo del progetto è lo sviluppo di modelli di AI, da impiegare nelle fasi preliminari 
+del processo di recruiting, per analizzare i bias che emergono. La scelta del target è stata 
+influenzata  dalla  struttura  del  dataset,  che  contiene  i  candidati  e  le  posizioni  gestiti  da 
+Akkodis. 
+In  base  ai  dati  disponibili  sono  stati  identificati  due  possibili  obiettivi  per  la  predizione 
+automatica:  
+- RAL: una nuova colonna per la predizione della RAL più adeguata al profilo del 
+candidato.  
+- Hired: una nuova colonna che etichetta le coppie candidato-posizione come positive 
+o  negative,  definendo  se  il  profilo  del  candidato  sia  adeguato  alle  richieste  della 
+azienda. 
+La prima ipotesi è stata scartata poiché più del 90% dei candidati non presenta alcun valore 
+per nessuno dei campi associati alla RAL.  
+D’altra parte, per poter distinguere tra candidati idonei e non idonei, è necessario analizzare 
+le tipologie di candidati presenti nel dataset.
+La feature target è la variabile che il modello ha il compito di predire.
+In questo caso, essa rappresenta l'esito di un processo decisionale, ovvero lo stato di assunzione del candidato.
+Tuttavia, il dataset originale non contiene una colonna esplicita binaria per questo scopo.
+Pertanto, è stata costruita una variabile target denominata Status, derivata da una combinazione logica di due colonne esistenti: Candidate State ed Event_Feedback.
+Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il modello di classificazione rispetti criteri di equità nel processo decisionale relativo all’assunzione dei candidati.
 
 .. code-block:: python
 
@@ -85,12 +208,7 @@ Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non deside
         mask |= df[col].isin(valid_values)
     df['Status'] = np.where(mask, 'Positive', 'Negative')
 
-
-2. Data Loading & Understanding
--------------------------------
-2.1 Feature Selection
-~~~~~~~~~~~~~~~~~~~~~
-
+**Feature Statistics**
 .. code-block:: python
 
     stats = pd.DataFrame(index=df.columns)
@@ -114,6 +232,24 @@ Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non deside
         distrib_df.head(20).plot(x=lookup, y='Count', kind='bar', legend=False)
         plt.title(lookup)
 
+**Sensitive Feature Selection**
+Nel contesto dell’analisi di equità algoritmica, le variabili considerate sensibili sono state individuate sulla base di criteri normativi (es. GDPR) e di rilevanza sociale, con l’obiettivo di monitorarne l’impatto sui tassi di assunzione e prevenire possibili discriminazioni. In particolare, sono state studiate le seguenti caratteristiche protette:
+
+- **Sesso (Gender)**
+Il dataset presenta una marcata sottorappresentazione delle candidate di sesso femminile (20% del totale). Tuttavia, il tasso di assunzione delle donne risulta superiore a quello degli uomini: l’8,3% contro il 5,3%. Questa differenza potrebbe riflettere una scelta organizzativa volta a incrementare la diversità di genere, oppure la maggiore qualificazione dei profili femminili, come suggerito dalla distribuzione dei titoli di studio (titoli di master e dottorato più frequenti tra le donne).
+Nonostante ciò, analizzando la RAL massima prevista a parità di titolo di studio e anni di esperienza, le donne ricevono offerte economiche lievemente inferiori. In mancanza di informazioni su orari o tipologia contrattuale non è possibile stabilire se si tratti di disparità ingiustificate o di scelte contrattuali differenziate.
+
+- **Fascia di età (Age Range)**
+Più del 65% dei candidati ha meno di 30 anni, di cui il 17% addirittura sotto i 20. Tuttavia, i tassi di assunzione crescono nelle fasce più mature, con un picco tra 31 e 45 anni, a conferma di una preferenza verso professionisti con maggiore esperienza. I candidati più giovani (≤ 26 anni) mostrano performance di assunzione complessivamente inferiori.
+
+- **Residenza europea e italiana**
+La residenza in Europa è associata a una probabilità di assunzione superiore rispetto ai residenti extra-UE, probabilmente per motivi di logistica, requisiti legali o presenza di uffici aziendali. All’interno dell’Europa, la residenza in Italia è ulteriormente favorita: il 6% dei residenti italiani viene assunto, contro il 4% dei non residenti. Questa discrepanza permane anche controllando titolo di studio e anni di esperienza, salvo differenze nei range salariali offerti, che risultano più elevati per i non residenti pur a parità di qualifiche.
+
+- **Categoria protetta (Protected Category)**
+Gli appartenenti a categorie protette rappresentano soltanto lo 0,6% del campione (18 candidati), un numero troppo esiguo per trarre conclusioni statisticamente significative sul loro tasso di assunzione. In fase di raccolta dati sarà quindi fondamentale aumentare la rappresentatività di questo gruppo per valutare eventuali disparità.
+
+In conclusione, l’analisi delle feature sensibili ha permesso di evidenziare bias potenziali – alcuni forse voluti (ad es. equity di genere), altri non facilmente giustificabili (divario salariale tra uomini e donne, preferenza per residenti italiani).
+Il passo successivo consisterà nell’integrare queste valutazioni all’interno del flusso di sviluppo del modello di selezione, applicando metriche di fairness e strumenti di mitigazione per garantire un processo di assunzione equo e trasparente.
 .. code-block:: python
 
     for snstv_col in config['sensitive_columns']:
@@ -148,36 +284,17 @@ Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non deside
         plt.title(f"Distribution of Status by {snstv_col}", fontsize=14)
         plt.xticks(rotation=45)
 
-**Identificazione delle Feature Sensibili**
-Nel contesto dell’equità algoritmica, è fondamentale identificare correttamente le feature sensibili, ovvero quelle variabili che rappresentano caratteristiche protette degli individui e che, se utilizzate impropriamente, possono introdurre o amplificare bias discriminatori.
-In questo progetto, le feature sensibili sono state individuate sulla base di criteri normativi (es. GDPR) e rilevanza sociale.
-Sono state considerate sensibili le variabili che descrivono aspetti come il genere, la cittadinanza, la residenza e altre caratteristiche personali potenzialmente soggette a disparità di trattamento.
-La selezione è stata effettuata analizzando le distribuzioni di tali feature e verificandone l’impatto sui tassi di assunzione.
-
-    - **1. Gender (Sex)**
-    Females are hired at a significantly higher rate than males, suggesting a possible organizational emphasis on gender diversity or a potential bias favoring female candidates.
-
-    - **2. Age Range**
-    Hiring rates increase with age, peaking between 31–45 years, indicating a clear preference for mid-career professionals with more experience. Younger candidates, especially under 26, face notably lower hiring chances.
-
-    - **3. European Residence**
-    Candidates residing in Europe are far more likely to be hired, which may reflect logistical preferences, legal work eligibility, or alignment with company locations and operations.
-
-    - **4. Italian Residence**
-    There is a strong hiring bias toward candidates living in Italy. This suggests the organization prefers local hires, potentially to reduce relocation costs or due to legal/employment constraints.
-
-    - **5. Protected Category**
-    No meaningful difference in hiring rates between protected and non-protected groups was found. However, due to the very small sample of protected category candidates, no reliable conclusion can be drawn.
-
-**Definizione della Feature Target**
-La feature target è la variabile che il modello ha il compito di predire.
-In questo caso, essa rappresenta l'esito di un processo decisionale, ovvero lo stato di assunzione del candidato.
-Tuttavia, il dataset originale non contiene una colonna esplicita binaria per questo scopo.
-Pertanto, è stata costruita una variabile target denominata Status, derivata da una combinazione logica di due colonne esistenti: Candidate State ed Event_Feedback.
-Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il modello di classificazione rispetti criteri di equità nel processo decisionale relativo all’assunzione dei candidati.
-
 2.2 Proxy Identification
 ~~~~~~~~~~~~~~~~~~~~~~~~
+**Cross-Correlation Analysis**
+Per evidenziare le relazioni tra le colonne del dataset e ottenere una rappresentazione grafica 
+riassuntiva è stata generata una matrice di correlazione, utilizzando la funzione heatmap di 
+Seaborn.
+.. code-block:: python
+
+    plt.figure(figsize=(16, 10))
+    sns.heatmap(df.corr().round(2), annot=True, cmap='coolwarm', center=0, linewidths=.5)
+    plt.title("Correlation Matrix of Numerical and Ordered Categorical Features")
 
 .. code-block:: python
 
@@ -225,6 +342,9 @@ Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il 
     print("Variable pairs with correlation above the threshold:")
     print(high_corr_pairs)
 
+**Chi-squared Test Analysis**
+Per identificare le variabili categoriche che potrebbero essere considerate proxy
+per le feature sensibili, è stata effettuata un’analisi basata sul test del chi-quadrato.
 .. code-block:: python
 
     def compute(col1, col2):
@@ -263,7 +383,22 @@ Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il 
 
 2.3 Bias Detection
 ~~~~~~~~~~~~~~~~~~
-
+Per valutare il livello di Fairness dei modelli addestrati sono state scelte tre metriche: 
+- Demographic Parity: Questa metrica richiede che ciascun gruppo abbia le stesse 
+opportunità di essere assegnato alla classe positiva (Hired=1), a prescindere che si 
+tratti  di  un  vero  o  falso  positivo.  Potrebbe  considerare  come  unfair  un  modello 
+accurato, nel caso di sottogruppi sbilanciati nei confronti della colonna target Hired 
+nel  test  set.  Per  esempio,  nel  dataset  di  riferimento  le  donne  hanno  un  tasso  di 
+assunzione più elevato rispetto agli uomini. Ipotizzando che il test set abbia la stessa 
+distribuzione,  un  modello  accurato  potrebbe  essere  considerato  unfair  secondo 
+questa  metrica.  Tuttavia,  in  caso  in  cui  il  test  set  presenti  sbilanciamenti  per 
+l’etichetta  Hired  causati  da  bias,  questi  vengono  identificati  se  perpetuati  dal 
+modello. 
+- Equalized Odds:  Questa  metrica  garantisce  che  i  tassi  di  True  Positive  e  False 
+Positive  siano  costanti  tra  gruppi  diversi.  Questo  significa,  per  esempio,  che  il 
+modello dovrebbe erroneamente classificare come positivi candidati non idonei con 
+uguale  probabilità  per  individui  appartenenti  a  categorie  diverse,  senza  favorire 
+nessun sottoinsieme.
 .. code-block:: python
 
     def compute_bias_metrics(df, sensitive_column, target_column):
@@ -288,7 +423,7 @@ Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il 
 
 3. Training and Testing
 -----------------------
-
+**Dataset Categorical Attributes Sorting and Encoding**
 .. code-block:: python
 
     columns_type = {}
@@ -308,9 +443,25 @@ Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il 
             df[col] = encoder.fit_transform(df[col].astype(str))
             encoding_mappings[col] = dict(zip(encoder.classes_, encoder.transform(encoder.classes_)))
 
+**Models**
+Per  garantire  una  panoramica  complessiva  sono  stati  selezionati  modelli  appartenenti  a 
+famiglie  algoritmiche  diverse,  includendo  modelli  lineari,  probabilistici,  ad  albero  e  reti 
+neurali. L’obiettivo è confrontare i risultati e mettere in relazione performance e fairness. 
+I modelli selezionati includono: 
+- Modelli Lineari 
+    - Linear Regression 
+    - Logistic Regression 
+- Modelli Probabilistici 
+    - Gaussian Naïve Bayes 
+- Modelli Tree-based 
+    - Decision Tree
+- Modelli Distance-based 
+    - K-Nearest Neighbors 
+- Rete Neurale
+ 
 3.1 Pre-processing Mitigation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+**Pre-processing**
 .. code-block:: python
 
     cr = CorrelationRemover(sensitive_feature_ids=sensitive, alpha=1)
@@ -321,8 +472,7 @@ Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il 
     X_test_cr = cr.transform(test_df)
     X_test_cr_df = pd.DataFrame(X_test_cr)
 
-- **Coordinate Plot - Original Vs Transformed Dataset**
-
+**Normalized Coordinate Plot - Original Vs Transformed Dataset**
 .. code-block:: python
 
     X_orig_df = X_train_split.copy()
@@ -365,6 +515,7 @@ Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il 
     plt.ylabel("Scaled feature value [0–1]")
     plt.grid(axis='y', linestyle='--', linewidth=0.5)
 
+**Coordinate Plot - Original Vs Transformed Dataset**
 .. code-block:: python
     
     X_orig_df = X_train_split.copy()
@@ -392,6 +543,7 @@ Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il 
     plt.ylabel("Feature value")
     plt.grid(axis='y', linestyle='--', linewidth=0.5)  # light horizontal grid
 
+**Models**
 .. code-block:: python
 
     def create_model(seed, input_dim):
@@ -420,6 +572,7 @@ Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il 
         'Neural Network': create_model(random_seed, X_train_cr_df.shape[1]),
     }
 
+**Training**
 .. code-block:: python
 
     for model_name, model in models.items():
@@ -438,89 +591,16 @@ Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il 
         temp = predictions[f"{model_name}_preprocessed_cr"]
         print(f"Preprocessed predictions for {model_name}: {temp}")
     
-- **Performance bar-plot**
-  - Accuracy
-  - Precision
-  - Recall
-  - F1-score
-  - AUC
-
-.. code-block:: python
-
-    metrics = []
-    for name in predictions_df.columns:
-        y_pred = predictions_df[name]
-        accuracy = round(accuracy_score(y_test, y_pred), 3)
-        precision = round(precision_score(y_test, y_pred), 3)
-        recall = round(recall_score(y_test, y_pred), 3)
-        f1 = round(f1_score(y_test, y_pred), 3)
-        roc_auc = round(roc_auc_score(y_test, y_pred), 3)
-
-        metrics.append({
-            'Model': name,
-            'Accuracy': accuracy,
-            'Precision': precision,
-            'Recall': recall,
-            'F1-score': f1,
-            'ROC AUC': roc_auc
-        })
-    metrics = pd.DataFrame(metrics)
-
-
-- **Fairness bar-plot**
-  - Demographic Parity Ratio
-  - Equalized Odds Ratio
-
-.. code-block:: python
-    
-    def compute_fairness_metrics(y_true, y_pred, s_test, label=None):
-        mf = MetricFrame(
-            metrics={
-                'selection_rate': selection_rate,
-                'fpr': false_positive_rate,
-                'fnr': false_negative_rate,
-                'count': count
-            },
-            y_true=y_true,
-            y_pred=y_pred,
-            sensitive_features=s_test
-        )
-
-        dp_diff = demographic_parity_difference(y_true, y_pred, sensitive_features=s_test)
-        eo_diff = equalized_odds_difference(y_true, y_pred, sensitive_features=s_test)
-
-        dp = demographic_parity_ratio(y_true, y_pred, sensitive_features=s_test)
-        eo = equalized_odds_ratio(y_true, y_pred, sensitive_features=s_test)
-
-        if label:
-            print(f"=== {label} ===")
-
-        print("By group:")
-        print(mf.by_group)
-        print()
-        print("Overall (selection_rate, fpr, fnr, count):")
-        print(mf.overall)
-        print()
-        print(f"Demographic parity difference: {dp_diff:.4f}")
-        print(f"Equalized odds difference:     {eo_diff:.4f}\n")
-        print()
-        print(f"Demographic parity ratio: {dp:.4f}")
-        print(f"Equalized odds ratio:     {eo:.4f}\n")
-
-        return mf
-
-    for name in predictions_df.columns:
-        compute_fairness_metrics(y_test, predictions_df[name], s_test, label=name)
-
 3.2 In-processing Mitigation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+**Models**
 .. code-block:: python
 
     models = {
         'Linear Regression': LinearRegression(),
     }
 
+**In-processing and Training**
 .. code-block:: python
 
     for model_name, model in models.items():
@@ -541,83 +621,9 @@ Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il 
         temp = predictions[f"{model_name}_inprocessed_gfc"]
         print(f"Inprocessed predictions for {model_name}: {temp}")
 
-- **Performance bar-plot**
-  - Accuracy
-  - Precision
-  - Recall
-  - F1-score
-  - AUC
-
-.. code-block:: python
-
-    metrics = []
-    for name in predictions_df.columns:
-        y_pred = predictions_df[name]
-        accuracy = round(accuracy_score(y_test, y_pred), 3)
-        precision = round(precision_score(y_test, y_pred), 3)
-        recall = round(recall_score(y_test, y_pred), 3)
-        f1 = round(f1_score(y_test, y_pred), 3)
-        roc_auc = round(roc_auc_score(y_test, y_pred), 3)
-
-        metrics.append({
-            'Model': name,
-            'Accuracy': accuracy,
-            'Precision': precision,
-            'Recall': recall,
-            'F1-score': f1,
-            'ROC AUC': roc_auc
-        })
-    metrics = pd.DataFrame(metrics)
-
-
-- **Fairness bar-plot**
-  - Demographic Parity Ratio
-  - Equalized Odds Ratio
-
-.. code-block:: python
-
-    def compute_fairness_metrics(y_true, y_pred, s_test, label=None):
-        mf = MetricFrame(
-            metrics={
-                'selection_rate': selection_rate,
-                'fpr': false_positive_rate,
-                'fnr': false_negative_rate,
-                'count': count
-            },
-            y_true=y_true,
-            y_pred=y_pred,
-            sensitive_features=s_test
-        )
-
-        dp_diff = demographic_parity_difference(y_true, y_pred, sensitive_features=s_test)
-        eo_diff = equalized_odds_difference(y_true, y_pred, sensitive_features=s_test)
-
-        dp = demographic_parity_ratio(y_true, y_pred, sensitive_features=s_test)
-        eo = equalized_odds_ratio(y_true, y_pred, sensitive_features=s_test)
-
-        if label:
-            print(f"=== {label} ===")
-
-        print("By group:")
-        print(mf.by_group)
-        print()
-        print("Overall (selection_rate, fpr, fnr, count):")
-        print(mf.overall)
-        print()
-        print(f"Demographic parity difference: {dp_diff:.4f}")
-        print(f"Equalized odds difference:     {eo_diff:.4f}\n")
-        print()
-        print(f"Demographic parity ratio: {dp:.4f}")
-        print(f"Equalized odds ratio:     {eo:.4f}\n")
-
-        return mf
-
-    for name in predictions_df.columns:
-        compute_fairness_metrics(y_test, predictions_df[name], s_test, label=name)
-
 3.3 Post-processing Mitigation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+**Models**
 .. code-block:: python
 
     def create_model(seed, input_dim):
@@ -646,6 +652,7 @@ Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il 
         'Neural Network': create_model(random_seed, train_df.shape[1]),
     }
 
+**Training**
 .. code-block:: python
 
     for model_name, model in models.items():
@@ -659,6 +666,7 @@ Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il 
 
         print(f"{model_name} trained.")
 
+**Post-processing**
 .. code-block:: python
 
     for model_name, model in models.items():
@@ -677,38 +685,73 @@ Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il 
         temp = predictions[f"{model_name}_postprocessed_to"]
         print(f"Postprocessed predictions for {model_name}: {temp}")
 
-- **Performance bar-plot**
-  - Accuracy
-  - Precision
-  - Recall
-  - F1-score
-  - AUC
+3. Performance and Fairness Metrics Evaluation
+-----------------------
+**Performance Metrics**
+ - Accuracy
+ - Precision
+ - Recall
+ - F1-score
+ - AUC
 
 .. code-block:: python
 
-    metrics = []
-    for name in predictions_df.columns:
-        y_pred = predictions_df[name]
-        accuracy = round(accuracy_score(y_test, y_pred), 3)
-        precision = round(precision_score(y_test, y_pred), 3)
-        recall = round(recall_score(y_test, y_pred), 3)
-        f1 = round(f1_score(y_test, y_pred), 3)
-        roc_auc = round(roc_auc_score(y_test, y_pred), 3)
+    records = []
+    for name, y_pred in predictions_df.items():
+        scores = {
+            'Model':      name,
+            'Accuracy':   accuracy_score(y_test, y_pred),
+            'Precision':  precision_score(y_test, y_pred),
+            'Recall':     recall_score(y_test, y_pred),
+            'F1-score':   f1_score(y_test, y_pred),
+            'ROC AUC':    roc_auc_score(y_test, y_pred),
+            'Group':      'Processed' if any(tag in name for tag in ['preprocessed','inprocessed','postprocessed'])
+                        else 'Base'
+        }
+        records.append(scores)
 
-        metrics.append({
-            'Model': name,
-            'Accuracy': accuracy,
-            'Precision': precision,
-            'Recall': recall,
-            'F1-score': f1,
-            'ROC AUC': roc_auc
-        })
-    metrics = pd.DataFrame(metrics)
+    df = pd.DataFrame(records).round(3)
 
+    df_long = df.melt(id_vars=['Model','Group'],
+                    value_vars=['Accuracy','Precision','Recall','F1-score','ROC AUC'],
+                    var_name='Metric',
+                    value_name='Value')
 
-- **Fairness bar-plot**
-  - Demographic Parity Ratio
-  - Equalized Odds Ratio
+    base_models = df.loc[df.Group=='Base','Model'].unique()
+
+    ncols = 3
+    nrows = int(np.ceil(len(base_models)/ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(ncols*4, nrows*3), sharey=True)
+    axes = axes.flatten()
+
+    for ax, base in zip(axes, base_models):
+        sel = df_long[df_long['Model'].str.startswith(base)]
+        
+        pivot = sel.pivot(index='Metric', columns='Model', values='Value')
+        variants = pivot.columns.tolist()
+        x = np.arange(len(pivot))
+        width = 0.8 / len(variants)
+
+        for i, var in enumerate(variants):
+            label = var.replace(base + '_', '') if var != base else 'Base'
+            ax.bar(x + (i - (len(variants)-1)/2)*width, pivot[var], width, label=label)
+
+        ax.set_xticks(x)
+        ax.set_xticklabels(pivot.index, rotation=45, ha='right')
+        ax.set_title(base)
+        ax.legend(fontsize='x-small')
+
+    for ax in axes[len(base_models):]:
+        ax.set_visible(False)
+
+    plt.tight_layout()
+    plt.show()
+
+**Fairness Metrics**
+ - Demographic Parity Ratio
+ - Equalized Odds Ratio
+ - Demographic Parity Difference
+ - Equalized Odds Difference
 
 .. code-block:: python
 
