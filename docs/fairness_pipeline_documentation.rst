@@ -1,115 +1,86 @@
 Fairness Pipeline Documentation
 ===============================
-Akkodis  è  un’azienda  globale  che  si  occupa  di  consulenza  e  offre  servizi  di  recruiting  e 
-formazione. Dal 2022 fa parte del gruppo Adecco, leader a livello mondiale nel reclutamento 
-di personale. Questa azienda si distingue nel settore per il suo impegno verso l’inclusività.
+Akkodis è un’azienda globale che si occupa di consulenza e offre servizi di recruiting e formazione. Dal 2022 fa parte del gruppo Adecco, leader mondiale nel reclutamento di personale. L’azienda si distingue per il suo impegno verso l’inclusività.
 
-**Struttura del Dataset** 
-Il  dataset  dell’azienda,  precedentemente  anonimizzato,  presenta  più  righe  per  ciascun 
-candidato memorizzato.  
-Per  ogni  candidato  ciascuna  riga  identifica  un  diverso  step  nel  processo  di  recruiting.  
-Le  colonne  possono  essere  suddivise  in  tre  macrocategorie:  attributi  del  candidato, 
-attributi del processo di recruiting  e  attributi della posizione  lavorativa,  associata  al 
-candidato.
+**Struttura del Dataset**
 
-**ATTRIBUTI del CANDIDATO:** 
-- ID: identificatore univoco 
-- Candidate State: stato del candidato 
-    - Imported: candidati importati da database esterni, come per esempio Alma 
-Laurea.  I  candidati  che  mantengono  questo  stato  potrebbero  non  aver  mai 
-risposto  ad  Akkodis.  Alcuni  presentano  l’evento  (Event_Type__Val)  CV 
-Request, che indica che il recruiter non ha ancora ricevuto il curriculum. 
-    - First contact: primi  contatti  con  il  candidato,  normalmente  per  telefono.  I 
-candidati che mantengono questo stato potrebbero aver interrotto i contatti 
-con  Akkodis  o  potrebbero  non  avere  un  curriculum  adeguato 
-(Event_Feedback = Inadequate CV). 
-    - In selection: candidati in fase di selezione, sottoposti ai primi colloqui, per 
-una posizione lavorativa selezionata tra quelle gestite dalla azienda 
-    - QM: candidati sottoposti a Qualification Meeting 
-    - Economic Proposal: candidati che hanno ricevuto una proposta economica 
-da parte della azienda  
-    - Vivier: candidati le cui competenze non sono risultate allineate con i requisiti 
-della posizione per cui sono stati valutati, ma sono ritenute valide da Akkodis 
-per opportunità future. 
-    - Hired il candidato è stato assunto dalla azienda che ha ingaggiato Akkodis 
-- Age  Range:  colonna  categorica  contenente  range  di  età 
- [< 20], [20 – 25], [26 – 30], [31 – 35], [36 – 40], [40 – 45], [> 45] 
-- Residence: attuale residenza del candidato  
-- Sex: sesso del candidato, ammette due valori (Male | Female) e il valore di default è 
-Male. 
-- Protected  Category:  indica  se  il  candidato  appartiene  alle  categorie  protette, 
-specificando l’articolo di riferimento (articoli 1 e 18). 
-- TAG: parole chiave utilizzate dal recruiter. 
-- Study Area: area di studio, disciplina accademica del candidato. 
-- Study Title: laurea o titolo accademico conseguito 
-    - Middle school diploma 
-    - Professional qualification 
-    - High school graduation 
-    - Three-year degree 
-    - Five-year degree 
-    - Master's degree 
-    - Doctorate 
-- Years  Experience:  range  di  anni  di  esperienza  del  candidato  
-[0], [0-1], [1-3], [3-5], [5-7], [7-10], [+10] 
-- Sector: settore nel quale il candidato ha esperienza. 
-- Last Role: ultimo ruolo lavorativo o di studio del candidato. 
-- Year of Insertion: anno di inserimento del candidato nel database. 
-- Year of Recruitment: anno di assunzione del candidato, presente solo se Candidate 
-State = Hired. 
-- Current Ral: RAL attuale del candidato. 
-- Expected Ral: aspettativa del candidato sulla RAL futura. 
+Il dataset dell’azienda, precedentemente anonimizzato, presenta più righe per ciascun candidato memorizzato. Per ogni candidato, ogni riga identifica uno step diverso nel processo di recruiting. Le colonne possono essere suddivise in tre macrocategorie:
+
+**ATTRIBUTI del CANDIDATO:**
+
+- **ID**: Identificatore univoco.
+- **Candidate State**: Stato del candidato:
+   - **Imported**: Candidati importati da database esterni (es. AlmaLaurea). Alcuni potrebbero non aver mai risposto ad Akkodis. `Event_Type__Val = CV Request` indica che il recruiter non ha ancora ricevuto il curriculum.
+   - **First contact**: Primi contatti (normalmente telefonici). Alcuni potrebbero aver interrotto i contatti o avere un curriculum inadeguato (`Event_Feedback = Inadequate CV`).
+   - **In selection**: Candidati in fase di selezione, sottoposti ai primi colloqui per una posizione lavorativa.
+   - **QM**: Candidati sottoposti a Qualification Meeting.
+   - **Economic Proposal**: Candidati che hanno ricevuto una proposta economica.
+   - **Vivier**: Candidati con competenze non allineate ai requisiti ma valide per opportunità future.
+   - **Hired**: Candidato assunto dall’azienda cliente.
+- **Age Range**: Range di età del candidato: [< 20], [20 – 25], [26 – 30], [31 – 35], [36 – 40], [40 – 45], [> 45] 
+- **Residence**: Residenza attuale.
+- **Sex**: Sesso del candidato (Male | Female, default: Male).
+- **Protected Category**: Indica se il candidato appartiene a categorie protette (Art.1 e Art.18).
+- **TAG**: Parole chiave utilizzate dal recruiter.
+- **Study Area**: Disciplina accademica di studio.
+- **Study Title**: Titolo accademico:
+  - Middle school diploma
+  - Professional qualification
+  - High school graduation
+  - Three-year degree
+  - Five-year degree
+  - Master’s degree
+  - Doctorate
+- **Years Experience**: Range di anni di esperienza: [0], [0-1], [1-3], [3-5], [5-7], [7-10], [+10] 
+- **Sector**: Settore di esperienza.
+- **Last Role**: Ultimo ruolo lavorativo o di studio.
+- **Year of Insertion**: Anno di inserimento nel database.
+- **Year of Recruitment**: Anno di assunzione (solo se `Candidate State = Hired`).
+- **Current RAL**: Retribuzione attuale.
+- **Expected RAL**: Aspettativa salariale.
  
 **ATTRIBUTI del PROCESSO:** 
-Sono relativi ad uno specifico stadio e cambiano per uno stesso candidato man mano che va 
-avanti nel processo di recruiting. 
-- Event_Type__Val: specifica il tipo di evento, lo stadio del processo di reclutamento. 
-Gli eventi presenti nel database possono essere suddivisi in 3 macrocategorie: 
-    - Eventi  iniziali:  Commercial  note,  CV  Request,  Contact  note,  Research 
-Association 
-    - Eventi  centrali:  HR  interview,  BM  interview,  Technical  interview, 
-Qualification Meeting 
-    - Eventi finali:  Candidate  notification,  Sending  SC  to  customer,  Economic 
-proposal, Notify candidate, Inadequate CV 
-- Event_Feedback: feedback associato ad uno specifico evento (Event_Type__Val), 
-può essere OK o KO, con eventuali commenti specificati tra parentesi. Non tutti i tipi 
-di eventi prevedono un feedback. 
-- Overall:  punteggio  associato  al  colloquio,  presente  solo  per  righe  contenenti 
-Event_Type__Val centrali, associati a colloqui. 
-- Akkodis headquarters: sede di Akkodis che gestisce il candidato. 
-Punteggi assegnati dal recruiter, da 1 a 4, durante il colloquio: 
-- Technical Skills: competenze tecniche. 
-- Standing/Position: posizione all’interno dell’organizzazione. 
-- Communication: competenze comunicative. 
-- Dynamism: livello di dinamicità. 
-- Mobility: mobilità. 
-- English: livello di inglese. 
+
+Sono relativi ad uno specifico stadio e cambiano per uno stesso candidato man mano che va avanti nel processo di recruiting.
+
+- **Event_Type__Val**: Tipo di evento/stadio del processo:
+   - **Iniziali**: Commercial note, CV Request, Contact note, Research Association.
+   - **Centrali**: HR interview, BM interview, Technical interview, Qualification Meeting.
+   - **Finali**: Candidate notification, Sending SC to customer, Economic proposal, Notify candidate, Inadequate CV.
+- **Event_Feedback**: Feedback associato all’evento (OK o KO, con eventuali commenti).
+- **Overall**: Punteggio del colloquio (solo per eventi centrali).
+- **Akkodis Headquarters**: Sede di Akkodis che gestisce il candidato.
+- Punteggi assegnati dal recruiter (1–4) durante il colloquio:
+  - **Technical Skills**
+  - **Standing/Position**
+  - **Communication**
+  - **Dynamism**
+  - **Mobility**
+  - **English**
 
 **ATTRIBUTI della POSIZIONE LAVORATIVA:** 
+
 Questi campi sono presenti solo se il candidato è stato assunto dalla azienda in questione. 
-- Recruitment Request: richiesta della azienda per un candidato. 
-- Assumption Headquarters: sede della posizione lavorativa. 
-- Job Family Hiring: categoria della posizione lavorativa. 
-- Job Title Hiring: titolo specifico della posizione. 
-- Job Description: descrizione del ruolo. 
-- Candidate Profile: profilo ideale del candidato, richiesto dalla azienda. 
-- Years Experience.1: anni di esperienza richiesti, espressi in range compatibili con 
-il campo Years Experience del candidato. 
-- Minimum Ral: RAL minima prevista. 
-- Ral Maximum: RAL massima prevista. 
-- Study Level:  livello  di  studio  richiesto  per  la  posizione  lavorativa,  i  valori  sono 
-compatibili con il campo Study Title. 
-- Study Area.1: specifica ambito di studio richiesto, contiene compatibili con Study 
-Area. 
-- Linked_search_key:  campo  contenente  un  codice,  non  univoco,  in  formato 
-RSnn.nnnn, nel quale il primo numero a due cifre identifica l’anno di inserimento 
-della posizione lavorativa mentre il numero dopo il punto indica il numero di ricerche 
-effettuate per una specifica posizione. 
+
+- **Recruitment Request**: Richiesta aziendale.
+- **Assumption Headquarters**: Sede della posizione.
+- **Job Family Hiring**: Categoria del ruolo.
+- **Job Title Hiring**: Titolo del ruolo.
+- **Job Description**: Descrizione del ruolo.
+- **Candidate Profile**: Profilo ideale richiesto.
+- **Years Experience.1**: Anni di esperienza richiesti (range compatibile con Years Experience del candidato).
+- **Minimum RAL**: RAL minima prevista.
+- **Maximum RAL**: RAL massima prevista.
+- **Study Level**: Livello di studio richiesto (compatibile con Study Title).
+- **Study Area.1**: Ambito di studio richiesto (compatibile con Study Area).
+- **Linked_search_key**: Codice `RSnn.nnnn` (nn = anno di inserimento, nnnn = numero di ricerche).
 
 1. Pre-processing
-----------------
+-----------------
 Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non desiderate, e applichiamo il remapping definito nel file di configurazione.
 
 **Data Cleaning**
+
 .. code-block:: python
 
     PATH = 'C:/Users/andre/Desktop/ProjectWork_AEQUITAS_AKKODIS/'
@@ -143,6 +114,7 @@ Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non deside
             df[col].fillna(filler, inplace=True)
 
 **Feature Mapping**
+
 .. code-block:: python
 
     def gen_lists(df, specs):
@@ -179,27 +151,18 @@ Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non deside
 -------------------------------
 2.1 Feature Selection
 ~~~~~~~~~~~~~~~~~~~~~
+
 **Target Selection**
-L’obiettivo del progetto è lo sviluppo di modelli di AI, da impiegare nelle fasi preliminari 
-del processo di recruiting, per analizzare i bias che emergono. La scelta del target è stata 
-influenzata  dalla  struttura  del  dataset,  che  contiene  i  candidati  e  le  posizioni  gestiti  da 
-Akkodis. 
-In  base  ai  dati  disponibili  sono  stati  identificati  due  possibili  obiettivi  per  la  predizione 
-automatica:  
-- RAL: una nuova colonna per la predizione della RAL più adeguata al profilo del 
-candidato.  
-- Hired: una nuova colonna che etichetta le coppie candidato-posizione come positive 
-o  negative,  definendo  se  il  profilo  del  candidato  sia  adeguato  alle  richieste  della 
-azienda. 
-La prima ipotesi è stata scartata poiché più del 90% dei candidati non presenta alcun valore 
-per nessuno dei campi associati alla RAL.  
-D’altra parte, per poter distinguere tra candidati idonei e non idonei, è necessario analizzare 
-le tipologie di candidati presenti nel dataset.
-La feature target è la variabile che il modello ha il compito di predire.
-In questo caso, essa rappresenta l'esito di un processo decisionale, ovvero lo stato di assunzione del candidato.
-Tuttavia, il dataset originale non contiene una colonna esplicita binaria per questo scopo.
-Pertanto, è stata costruita una variabile target denominata Status, derivata da una combinazione logica di due colonne esistenti: Candidate State ed Event_Feedback.
-Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il modello di classificazione rispetti criteri di equità nel processo decisionale relativo all’assunzione dei candidati.
+
+L’obiettivo del progetto è lo sviluppo di modelli di AI da impiegare nelle fasi preliminari del processo di recruiting per analizzare i bias emergenti. La scelta del target è stata influenzata dalla struttura del dataset, che contiene informazioni sui candidati e sulle posizioni gestite da Akkodis.
+In base ai dati disponibili, sono stati identificati due possibili obiettivi di predizione automatica:
+
+- RAL: Predire la RAL più adeguata al profilo del candidato.
+- Hired: Etichettare la coppia candidato-posizione come positiva o negativa, definendo se il profilo del candidato sia adeguato alle richieste aziendali.
+
+La prima ipotesi è stata scartata poiché oltre il 90% dei candidati non presenta valori per i campi relativi alla RAL.
+Per distinguere tra candidati idonei e non idonei, è necessario definire una variabile target esplicita. Il dataset originale non contiene una colonna binaria per questo scopo. Pertanto è stata creata la variabile Status, derivata logicamente dalle colonne Candidate State ed Event_Feedback.
+Questa scelta è coerente con l’obiettivo di valutare se i modelli di classificazione rispettino criteri di equità nel processo decisionale di assunzione.
 
 .. code-block:: python
 
@@ -209,6 +172,7 @@ Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il 
     df['Status'] = np.where(mask, 'Positive', 'Negative')
 
 **Feature Statistics**
+
 .. code-block:: python
 
     stats = pd.DataFrame(index=df.columns)
@@ -233,23 +197,22 @@ Questa scelta è coerente con l’obiettivo del progetto, che è valutare se il 
         plt.title(lookup)
 
 **Sensitive Feature Selection**
+
 Nel contesto dell’analisi di equità algoritmica, le variabili considerate sensibili sono state individuate sulla base di criteri normativi (es. GDPR) e di rilevanza sociale, con l’obiettivo di monitorarne l’impatto sui tassi di assunzione e prevenire possibili discriminazioni. In particolare, sono state studiate le seguenti caratteristiche protette:
 
 - **Sesso (Gender)**
-Il dataset presenta una marcata sottorappresentazione delle candidate di sesso femminile (20% del totale). Tuttavia, il tasso di assunzione delle donne risulta superiore a quello degli uomini: l’8,3% contro il 5,3%. Questa differenza potrebbe riflettere una scelta organizzativa volta a incrementare la diversità di genere, oppure la maggiore qualificazione dei profili femminili, come suggerito dalla distribuzione dei titoli di studio (titoli di master e dottorato più frequenti tra le donne).
-Nonostante ciò, analizzando la RAL massima prevista a parità di titolo di studio e anni di esperienza, le donne ricevono offerte economiche lievemente inferiori. In mancanza di informazioni su orari o tipologia contrattuale non è possibile stabilire se si tratti di disparità ingiustificate o di scelte contrattuali differenziate.
-
+    Il dataset presenta una marcata sottorappresentazione delle candidate di sesso femminile (20% del totale). Tuttavia, il tasso di assunzione delle donne risulta superiore a quello degli uomini: l’8,3% contro il 5,3%. Questa differenza potrebbe riflettere una scelta organizzativa volta a incrementare la diversità di genere, oppure la maggiore qualificazione dei profili femminili, come suggerito dalla distribuzione dei titoli di studio (titoli di master e dottorato più frequenti tra le donne).
+    Nonostante ciò, analizzando la RAL massima prevista a parità di titolo di studio e anni di esperienza, le donne ricevono offerte economiche lievemente inferiori. In mancanza di informazioni su orari o tipologia contrattuale non è possibile stabilire se si tratti di disparità ingiustificate o di scelte contrattuali differenziate.
 - **Fascia di età (Age Range)**
-Più del 65% dei candidati ha meno di 30 anni, di cui il 17% addirittura sotto i 20. Tuttavia, i tassi di assunzione crescono nelle fasce più mature, con un picco tra 31 e 45 anni, a conferma di una preferenza verso professionisti con maggiore esperienza. I candidati più giovani (≤ 26 anni) mostrano performance di assunzione complessivamente inferiori.
-
+    Più del 65% dei candidati ha meno di 30 anni, di cui il 17% addirittura sotto i 20. Tuttavia, i tassi di assunzione crescono nelle fasce più mature, con un picco tra 31 e 45 anni, a conferma di una preferenza verso professionisti con maggiore esperienza. I candidati più giovani (≤ 26 anni) mostrano performance di assunzione complessivamente inferiori.
 - **Residenza europea e italiana**
-La residenza in Europa è associata a una probabilità di assunzione superiore rispetto ai residenti extra-UE, probabilmente per motivi di logistica, requisiti legali o presenza di uffici aziendali. All’interno dell’Europa, la residenza in Italia è ulteriormente favorita: il 6% dei residenti italiani viene assunto, contro il 4% dei non residenti. Questa discrepanza permane anche controllando titolo di studio e anni di esperienza, salvo differenze nei range salariali offerti, che risultano più elevati per i non residenti pur a parità di qualifiche.
-
+    La residenza in Europa è associata a una probabilità di assunzione superiore rispetto ai residenti extra-UE, probabilmente per motivi di logistica, requisiti legali o presenza di uffici aziendali. All’interno dell’Europa, la residenza in Italia è ulteriormente favorita: il 6% dei residenti italiani viene assunto, contro il 4% dei non residenti. Questa discrepanza permane anche controllando titolo di studio e anni di esperienza, salvo differenze nei range salariali offerti, che risultano più elevati per i non residenti pur a parità di qualifiche.
 - **Categoria protetta (Protected Category)**
-Gli appartenenti a categorie protette rappresentano soltanto lo 0,6% del campione (18 candidati), un numero troppo esiguo per trarre conclusioni statisticamente significative sul loro tasso di assunzione. In fase di raccolta dati sarà quindi fondamentale aumentare la rappresentatività di questo gruppo per valutare eventuali disparità.
+    Gli appartenenti a categorie protette rappresentano soltanto lo 0,6% del campione (18 candidati), un numero troppo esiguo per trarre conclusioni statisticamente significative sul loro tasso di assunzione. In fase di raccolta dati sarà quindi fondamentale aumentare la rappresentatività di questo gruppo per valutare eventuali disparità.
 
 In conclusione, l’analisi delle feature sensibili ha permesso di evidenziare bias potenziali – alcuni forse voluti (ad es. equity di genere), altri non facilmente giustificabili (divario salariale tra uomini e donne, preferenza per residenti italiani).
 Il passo successivo consisterà nell’integrare queste valutazioni all’interno del flusso di sviluppo del modello di selezione, applicando metriche di fairness e strumenti di mitigazione per garantire un processo di assunzione equo e trasparente.
+
 .. code-block:: python
 
     for snstv_col in config['sensitive_columns']:
@@ -286,10 +249,11 @@ Il passo successivo consisterà nell’integrare queste valutazioni all’intern
 
 2.2 Proxy Identification
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
 **Cross-Correlation Analysis**
-Per evidenziare le relazioni tra le colonne del dataset e ottenere una rappresentazione grafica 
-riassuntiva è stata generata una matrice di correlazione, utilizzando la funzione heatmap di 
-Seaborn.
+
+Per evidenziare le relazioni tra le colonne del dataset e ottenere una rappresentazione grafica riassuntiva è stata generata una matrice di correlazione, utilizzando la funzione heatmap di Seaborn
+
 .. code-block:: python
 
     plt.figure(figsize=(16, 10))
@@ -343,8 +307,9 @@ Seaborn.
     print(high_corr_pairs)
 
 **Chi-squared Test Analysis**
-Per identificare le variabili categoriche che potrebbero essere considerate proxy
-per le feature sensibili, è stata effettuata un’analisi basata sul test del chi-quadrato.
+
+Per identificare le variabili categoriche che potrebbero essere considerate proxy per le feature sensibili, è stata effettuata un’analisi basata sul test del chi-quadrato.
+
 .. code-block:: python
 
     def compute(col1, col2):
@@ -384,21 +349,10 @@ per le feature sensibili, è stata effettuata un’analisi basata sul test del c
 2.3 Bias Detection
 ~~~~~~~~~~~~~~~~~~
 Per valutare il livello di Fairness dei modelli addestrati sono state scelte tre metriche: 
-- Demographic Parity: Questa metrica richiede che ciascun gruppo abbia le stesse 
-opportunità di essere assegnato alla classe positiva (Hired=1), a prescindere che si 
-tratti  di  un  vero  o  falso  positivo.  Potrebbe  considerare  come  unfair  un  modello 
-accurato, nel caso di sottogruppi sbilanciati nei confronti della colonna target Hired 
-nel  test  set.  Per  esempio,  nel  dataset  di  riferimento  le  donne  hanno  un  tasso  di 
-assunzione più elevato rispetto agli uomini. Ipotizzando che il test set abbia la stessa 
-distribuzione,  un  modello  accurato  potrebbe  essere  considerato  unfair  secondo 
-questa  metrica.  Tuttavia,  in  caso  in  cui  il  test  set  presenti  sbilanciamenti  per 
-l’etichetta  Hired  causati  da  bias,  questi  vengono  identificati  se  perpetuati  dal 
-modello. 
-- Equalized Odds:  Questa  metrica  garantisce  che  i  tassi  di  True  Positive  e  False 
-Positive  siano  costanti  tra  gruppi  diversi.  Questo  significa,  per  esempio,  che  il 
-modello dovrebbe erroneamente classificare come positivi candidati non idonei con 
-uguale  probabilità  per  individui  appartenenti  a  categorie  diverse,  senza  favorire 
-nessun sottoinsieme.
+
+- Demographic Parity: Questa metrica richiede che ciascun gruppo abbia le stesse opportunità di essere assegnato alla classe positiva (Hired=1), indipendentemente da veri o falsi positivi. Un modello accurato potrebbe risultare unfair se i sottogruppi nel test set sono sbilanciati rispetto alla variabile target Hired. Ad esempio, se le donne nel dataset hanno un tasso di assunzione più elevato rispetto agli uomini e il test set riflette questa distribuzione, un modello preciso potrebbe comunque violare la demografica pari opportunità. Tuttavia, se tali sbilanciamenti riflettono bias storici, la metrica individua il perpetuarsi di tali bias da parte del modello.
+- Equalized Odds: Questa metrica garantisce che i tassi di True Positive Rate (TPR) e False Positive Rate (FPR) siano costanti tra i diversi gruppi. Significa che il modello dovrebbe classificare erroneamente candidati non idonei come positivi con uguale probabilità per tutte le categorie, evitando di favorire o penalizzare un particolare sottoinsieme.
+
 .. code-block:: python
 
     def compute_bias_metrics(df, sensitive_column, target_column):
@@ -423,7 +377,9 @@ nessun sottoinsieme.
 
 3. Training and Testing
 -----------------------
+
 **Dataset Categorical Attributes Sorting and Encoding**
+
 .. code-block:: python
 
     columns_type = {}
@@ -444,10 +400,12 @@ nessun sottoinsieme.
             encoding_mappings[col] = dict(zip(encoder.classes_, encoder.transform(encoder.classes_)))
 
 **Models**
+
 Per  garantire  una  panoramica  complessiva  sono  stati  selezionati  modelli  appartenenti  a 
 famiglie  algoritmiche  diverse,  includendo  modelli  lineari,  probabilistici,  ad  albero  e  reti 
 neurali. L’obiettivo è confrontare i risultati e mettere in relazione performance e fairness. 
 I modelli selezionati includono: 
+
 - Modelli Lineari 
     - Linear Regression 
     - Logistic Regression 
@@ -461,7 +419,9 @@ I modelli selezionati includono:
  
 3.1 Pre-processing Mitigation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 **Pre-processing**
+
 .. code-block:: python
 
     cr = CorrelationRemover(sensitive_feature_ids=sensitive, alpha=1)
@@ -473,6 +433,7 @@ I modelli selezionati includono:
     X_test_cr_df = pd.DataFrame(X_test_cr)
 
 **Normalized Coordinate Plot - Original Vs Transformed Dataset**
+
 .. code-block:: python
 
     X_orig_df = X_train_split.copy()
@@ -516,6 +477,7 @@ I modelli selezionati includono:
     plt.grid(axis='y', linestyle='--', linewidth=0.5)
 
 **Coordinate Plot - Original Vs Transformed Dataset**
+
 .. code-block:: python
     
     X_orig_df = X_train_split.copy()
@@ -544,6 +506,7 @@ I modelli selezionati includono:
     plt.grid(axis='y', linestyle='--', linewidth=0.5)  # light horizontal grid
 
 **Models**
+
 .. code-block:: python
 
     def create_model(seed, input_dim):
@@ -573,6 +536,7 @@ I modelli selezionati includono:
     }
 
 **Training**
+
 .. code-block:: python
 
     for model_name, model in models.items():
@@ -593,7 +557,9 @@ I modelli selezionati includono:
     
 3.2 In-processing Mitigation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 **Models**
+
 .. code-block:: python
 
     models = {
@@ -601,6 +567,7 @@ I modelli selezionati includono:
     }
 
 **In-processing and Training**
+
 .. code-block:: python
 
     for model_name, model in models.items():
@@ -623,7 +590,9 @@ I modelli selezionati includono:
 
 3.3 Post-processing Mitigation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 **Models**
+
 .. code-block:: python
 
     def create_model(seed, input_dim):
@@ -653,6 +622,7 @@ I modelli selezionati includono:
     }
 
 **Training**
+
 .. code-block:: python
 
     for model_name, model in models.items():
@@ -667,6 +637,7 @@ I modelli selezionati includono:
         print(f"{model_name} trained.")
 
 **Post-processing**
+
 .. code-block:: python
 
     for model_name, model in models.items():
@@ -685,14 +656,16 @@ I modelli selezionati includono:
         temp = predictions[f"{model_name}_postprocessed_to"]
         print(f"Postprocessed predictions for {model_name}: {temp}")
 
-3. Performance and Fairness Metrics Evaluation
------------------------
+4. Performance and Fairness Metrics Evaluation
+----------------------------------------------
+
 **Performance Metrics**
- - Accuracy
- - Precision
- - Recall
- - F1-score
- - AUC
+
+- Accuracy
+- Precision
+- Recall
+- F1-score
+- AUC
 
 .. code-block:: python
 
@@ -748,10 +721,11 @@ I modelli selezionati includono:
     plt.show()
 
 **Fairness Metrics**
- - Demographic Parity Ratio
- - Equalized Odds Ratio
- - Demographic Parity Difference
- - Equalized Odds Difference
+
+- Demographic Parity Ratio
+- Equalized Odds Ratio
+- Demographic Parity Difference
+- Equalized Odds Difference
 
 .. code-block:: python
 
