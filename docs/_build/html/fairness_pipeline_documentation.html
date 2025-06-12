@@ -296,6 +296,7 @@ Questa scelta è coerente con l’obiettivo di valutare se i modelli di classifi
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+<img alt="_images/count.png" src="_images/count.png" />
 <p><strong>Sensitive Feature Selection</strong></p>
 <p>Nel contesto dell’analisi di equità algoritmica, le variabili considerate sensibili sono state individuate sulla base di criteri normativi (es. GDPR) e di rilevanza sociale, con l’obiettivo di monitorarne l’impatto sui tassi di assunzione e prevenire possibili discriminazioni. In particolare, sono state studiate le seguenti caratteristiche protette:</p>
 <ul class="simple">
@@ -375,6 +376,7 @@ Il passo successivo consisterà nell’integrare queste valutazioni all’intern
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+<img alt="_images/distribution.png" src="_images/distribution.png" />
 </section>
 <section id="proxy-identification">
 <h3>2.2 Proxy Identification<a class="headerlink" href="#proxy-identification" title="Permalink to this heading">¶</a></h3>
@@ -407,6 +409,7 @@ Il passo successivo consisterà nell’integrare queste valutazioni all’intern
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Correlation Matrix&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<img alt="_images/corr1.png" src="_images/corr1.png" />
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df_num</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s1">&#39;number&#39;</span><span class="p">)</span>
 
 <span class="n">cat_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;categorical_columns_custom_orders&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -427,6 +430,7 @@ Il passo successivo consisterà nell’integrare queste valutazioni all’intern
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Correlation Matrix of Numerical and Ordered Categorical Features&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<img alt="_images/corr2.png" src="_images/corr2.png" />
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">corr_matrix</span> <span class="o">=</span> <span class="n">df_corr</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
 
 <span class="c1"># Create a mask to get the upper triangle (excluding the diagonal)</span>
@@ -625,6 +629,7 @@ Fisher&#39;s exact test: χ² = 821.50, p = 0.000, dof = 1, Cramér’s V = 0.56
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+<img alt="_images/pre_fairness.png" src="_images/pre_fairness.png" />
 </section>
 </section>
 <section id="training-and-testing">
@@ -737,6 +742,7 @@ I modelli selezionati includono:</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 </pre></div>
 </div>
+<img alt="_images/plot_norm.png" src="_images/plot_norm.png" />
 <p><strong>Coordinate Plot - Original Vs Transformed Dataset</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X_orig_df</span> <span class="o">=</span> <span class="n">X_train_split</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="n">X_orig_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">sensitive</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -764,6 +770,7 @@ I modelli selezionati includono:</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>  <span class="c1"># light horizontal grid</span>
 </pre></div>
 </div>
+<img alt="_images/plot.png" src="_images/plot.png" />
 <p><strong>Models</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">create_model</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">input_dim</span><span class="p">):</span>
     <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
@@ -965,6 +972,7 @@ I modelli selezionati includono:</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+<img alt="_images/performance.png" src="_images/performance.png" />
 <p><strong>Fairness Metrics</strong></p>
 <ul class="simple">
 <li><p>Demographic Parity Ratio</p></li>
@@ -1012,6 +1020,7 @@ I modelli selezionati includono:</p>
     <span class="n">compute_fairness_metrics</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predictions_df</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">s_test</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 </pre></div>
 </div>
+<img alt="_images/fairness.png" src="_images/fairness.png" />
 </section>
 </section>
 

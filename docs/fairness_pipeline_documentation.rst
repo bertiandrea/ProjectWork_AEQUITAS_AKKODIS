@@ -255,6 +255,9 @@ Questa scelta è coerente con l’obiettivo di valutare se i modelli di classifi
 
     plt.show()
 
+.. image:: _static/count.png
+
+
 **Sensitive Feature Selection**
 
 Nel contesto dell’analisi di equità algoritmica, le variabili considerate sensibili sono state individuate sulla base di criteri normativi (es. GDPR) e di rilevanza sociale, con l’obiettivo di monitorarne l’impatto sui tassi di assunzione e prevenire possibili discriminazioni. In particolare, sono state studiate le seguenti caratteristiche protette:
@@ -325,6 +328,9 @@ Il passo successivo consisterà nell’integrare queste valutazioni all’intern
 
     plt.show()
 
+.. image:: _static/distribution.png
+
+
 2.2 Proxy Identification
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -360,6 +366,9 @@ Per evidenziare le relazioni tra le colonne del dataset e ottenere una rappresen
     sns.heatmap(df_corr.corr().round(2), annot=True, cmap='coolwarm', center=0, linewidths=.5)
     plt.title("Correlation Matrix")
 
+.. image:: _static/corr1.png
+
+
 .. code-block:: python
 
     df_num = df.select_dtypes(include='number')
@@ -380,6 +389,9 @@ Per evidenziare le relazioni tra le colonne del dataset e ottenere una rappresen
     plt.figure(figsize=(16, 10))
     sns.heatmap(df_corr.corr().round(2), annot=True, cmap='coolwarm', center=0, linewidths=.5)
     plt.title("Correlation Matrix of Numerical and Ordered Categorical Features")
+
+.. image:: _static/corr2.png
+
 
 .. code-block:: python
 
@@ -579,6 +591,9 @@ Per valutare il livello di Fairness dei modelli addestrati sono state scelte tre
 
     plt.show()
 
+.. image:: _static/pre_fairness.png
+
+
 3. Training and Testing
 -----------------------
 
@@ -678,6 +693,9 @@ I modelli selezionati includono:
     plt.ylabel("Scaled feature value [0–1]")
     plt.grid(axis='y', linestyle='--', linewidth=0.5)
 
+.. image:: _static/plot_norm.png
+
+
 **Coordinate Plot - Original Vs Transformed Dataset**
 
 .. code-block:: python
@@ -706,6 +724,9 @@ I modelli selezionati includono:
     plt.xticks(rotation=45, ha='right')
     plt.ylabel("Feature value")
     plt.grid(axis='y', linestyle='--', linewidth=0.5)  # light horizontal grid
+
+.. image:: _static/plot.png
+
 
 **Models**
 
@@ -922,6 +943,9 @@ I modelli selezionati includono:
     plt.tight_layout()
     plt.show()
 
+.. image:: _static/performance.png
+
+
 **Fairness Metrics**
 
 - Demographic Parity Ratio
@@ -969,3 +993,5 @@ I modelli selezionati includono:
 
     for name in predictions_df.columns:
         compute_fairness_metrics(y_test, predictions_df[name], s_test, label=name)
+
+.. image:: _static/fairness.png
