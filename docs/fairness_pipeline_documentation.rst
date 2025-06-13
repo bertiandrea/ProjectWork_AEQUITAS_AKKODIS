@@ -75,11 +75,9 @@ Questi campi sono presenti solo se il candidato è stato assunto dalla azienda i
 - **Study Area.1**: Ambito di studio richiesto (compatibile con Study Area).
 - **Linked_search_key**: Codice `RSnn.nnnn` (nn = anno di inserimento, nnnn = numero di ricerche).
 
-1. Pre-processing
+1. Data Cleaning
 -----------------
 Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non desiderate, e applichiamo il remapping definito nel file di configurazione.
-
-**Data Cleaning**
 
 .. code-block:: python
 
@@ -159,11 +157,17 @@ In base ai dati disponibili, sono stati identificati due possibili obiettivi di 
 
 - **RAL**
     Predire la RAL più adeguata al profilo del candidato.
-- **Hired**
+- **Status**
     Etichettare la coppia candidato-posizione come positiva o negativa, definendo se il profilo del candidato sia adeguato alle richieste aziendali.
+    In particolare, un candidato viene considerato Positive se risulta in una delle situazioni seguenti:
+    
+    - Il suo Candidate State indica che è stato assunto (Hired), ha ricevuto un’offerta economica (Economic proposal) oppure è arrivato al Qualification Meeting (QM), fase chiave di valutazione avanzata.
+    - Il suo ultimo Event_Feedback riporta un riscontro positivo, come un feedback tecnico in diretta (OK (live)), la conferma dell’inizio imminente dell’attività (OK (waiting for departure)) o la conferma esplicita di assunzione (OK (hired)).
+    - In qualsiasi altro caso, il profilo viene etichettato Negative, segnalando che non ha soddisfatto i requisiti aziendali a livelli decisionali rilevanti.
 
 La prima ipotesi è stata scartata poiché oltre il 90% dei candidati non presenta valori per i campi relativi alla RAL.
-Per distinguere tra candidati idonei e non idonei, è necessario definire una variabile target esplicita. Il dataset originale non contiene una colonna binaria per questo scopo. Pertanto è stata creata la variabile Status, derivata logicamente dalle colonne Candidate State ed Event_Feedback.
+Per distinguere tra candidati idonei e non idonei, è necessario definire una variabile target esplicita, tuttavia il dataset originale non contiene una colonna binaria per questo scopo.
+Pertanto è stata creata la variabile Status, derivata logicamente, in base ai criteri appena mostrati, dalle colonne Candidate State ed Event_Feedback.
 Questa scelta è coerente con l’obiettivo di valutare se i modelli di classificazione rispettino criteri di equità nel processo decisionale di assunzione.
 
 .. code-block:: python
@@ -263,16 +267,15 @@ Questa scelta è coerente con l’obiettivo di valutare se i modelli di classifi
 Nel contesto dell’analisi di equità algoritmica, le variabili considerate sensibili sono state individuate sulla base di criteri normativi (es. GDPR) e di rilevanza sociale, con l’obiettivo di monitorarne l’impatto sui tassi di assunzione e prevenire possibili discriminazioni. In particolare, sono state studiate le seguenti caratteristiche protette:
 
 - **Sesso (Gender)**
-    Il dataset presenta una marcata sottorappresentazione delle candidate di sesso femminile (20% del totale). Tuttavia, il tasso di assunzione delle donne risulta superiore a quello degli uomini: l’8,3% contro il 5,3%. Questa differenza potrebbe riflettere una scelta organizzativa volta a incrementare la diversità di genere, oppure la maggiore qualificazione dei profili femminili, come suggerito dalla distribuzione dei titoli di studio (titoli di master e dottorato più frequenti tra le donne).
-    Nonostante ciò, analizzando la RAL massima prevista a parità di titolo di studio e anni di esperienza, le donne ricevono offerte economiche lievemente inferiori. In mancanza di informazioni su orari o tipologia contrattuale non è possibile stabilire se si tratti di disparità ingiustificate o di scelte contrattuali differenziate.
+    Il dataset presenta una marcata sottorappresentazione delle candidate di sesso femminile (20% del totale). Tuttavia, il tasso di assunzione delle donne risulta superiore a quello degli uomini: l’8,3% contro il 5,3%. Questa differenza potrebbe riflettere una scelta organizzativa volta a incrementare la diversità di genere, oppure la maggiore qualificazione dei profili femminili.
 - **Fascia di età (Age Range)**
     Più del 65% dei candidati ha meno di 30 anni, di cui il 17% addirittura sotto i 20. Tuttavia, i tassi di assunzione crescono nelle fasce più mature, con un picco tra 31 e 45 anni, a conferma di una preferenza verso professionisti con maggiore esperienza. I candidati più giovani (≤ 26 anni) mostrano performance di assunzione complessivamente inferiori.
-- **Residenza europea e italiana**
-    La residenza in Europa è associata a una probabilità di assunzione superiore rispetto ai residenti extra-UE, probabilmente per motivi di logistica, requisiti legali o presenza di uffici aziendali. All’interno dell’Europa, la residenza in Italia è ulteriormente favorita: il 6% dei residenti italiani viene assunto, contro il 4% dei non residenti. Questa discrepanza permane anche controllando titolo di studio e anni di esperienza, salvo differenze nei range salariali offerti, che risultano più elevati per i non residenti pur a parità di qualifiche.
+- **Residenza italiana**
+    I candidati con residenza in Italia mostrano una probabilità di assunzione più elevata, probabilmente a causa di fattori logistici, vincoli normativi e della presenza di uffici locali.
+    Tuttavia, il numero di non residenti nel nostro campione è esiguo, rendendo impossibile trarre conclusioni significative sul loro tasso di assunzione. Durante la fase successiva di raccolta dati, sarà dunque essenziale aumentare la rappresentatività di questo gruppo per analizzare eventuali disparità.
 - **Categoria protetta (Protected Category)**
-    Gli appartenenti a categorie protette rappresentano soltanto lo 0,6% del campione (18 candidati), un numero troppo esiguo per trarre conclusioni statisticamente significative sul loro tasso di assunzione. In fase di raccolta dati sarà quindi fondamentale aumentare la rappresentatività di questo gruppo per valutare eventuali disparità.
+    Gli appartenenti alle categorie protette costituiscono solo lo 0,6 % del campione (18 candidati), un’incidenza troppo bassa per consentire valutazioni statistiche affidabili sul loro esito di selezione. Per stabilire se esistano discriminazioni o differenze sostanziali, anche in questo caso risulta fondamentale aumentare la rappresentatività del gruppo per effettuare una analisi adeguata sulle possibili disparità.
 
-In conclusione, l’analisi delle feature sensibili ha permesso di evidenziare bias potenziali – alcuni forse voluti (ad es. equity di genere), altri non facilmente giustificabili (divario salariale tra uomini e donne, preferenza per residenti italiani).
 Il passo successivo consisterà nell’integrare queste valutazioni all’interno del flusso di sviluppo del modello di selezione, applicando metriche di fairness e strumenti di mitigazione per garantire un processo di assunzione equo e trasparente.
 
 .. code-block:: python
@@ -445,104 +448,62 @@ Per identificare le variabili categoriche che potrebbero essere considerate prox
 
         return contingency, expected, chi2, p, dof, cramer_v, test_name
 
+    results = []
     cats = [col for col, t in columns_type.items() if t == 'cat']
-    for col1, col2 in combinations(cats, 2):
-        if col1 == col2:
-            continue
-         
-        contingency, expected, chi2, p, dof, cramer_v, test_name = compute(col1, col2)
 
-        if p < config['chi_squared_p_value_threshold'] and cramer_v >= config['cramers_v_threshold']:
-            print(f"--- {col1} vs {col2} ---")
-            #print("Actual frequencies:")
-            #print(contingency)
-            #print()
-            #print("Expected frequencies:")
-            #print(pd.DataFrame(expected, index=contingency.index, columns=contingency.columns))
-            #print()
-            print(f"{test_name} test: χ² = {chi2:.2f}, p = {p:.3f}, dof = {dof}, Cramér’s V = {cramer_v:.3f}")
-            print()
+    for col1, col2 in combinations(cats, 2):
+        # Skip cause Residence attributes are highly correlated within themselves
+        if 'Residence' in col1 or 'Residence' in col2:
+            continue
+        
+        contingency, expected, chi2, p_raw, dof, cramer_v, test_name = compute(col1, col2)
+        results.append({
+            'col1':     col1,
+            'col2':     col2,
+            'chi2':     chi2,
+            'p_raw':    p_raw,
+            'dof':      dof,
+            'cramer_v': cramer_v,
+            'test':     test_name
+        })
+    res_df = pd.DataFrame(results)
+
+    # Correzione Bonferroni su tutti i p_raw
+    reject, p_bonf, _, _ = multipletests(res_df['p_raw'], method='bonferroni')
+    res_df['p_bonf']      = p_bonf
+    res_df['significant'] = reject
+
+    thr_p = config['chi_squared_p_value_threshold']
+    thr_v = config['cramers_v_threshold']
+    mask = (res_df['p_bonf'] < thr_p) & (res_df['cramer_v'] >= thr_v)
+
+    for _, row in res_df[mask].sort_values('cramer_v', ascending=False).iterrows():
+        print(f"--- {row['col1']} vs {row['col2']} ---")
+        print(f"{row['test']} test: "
+            f"χ² = {row['chi2']:.2f}, "
+            f"p (raw) = {row['p_raw']:.3e}, "
+            f"p (Bonf.) = {row['p_bonf']:.3e}, "
+            f"dof = {row['dof']}, "
+            f"Cramér’s V = {row['cramer_v']:.3f}")
+        print()
 
 .. code-block:: text
 
     --- Age Range vs Years Experience ---
-    Chi-squared test: χ² = 2092.78, p = 0.000, dof = 36, Cramér’s V = 0.368
-
-    --- Age Range vs Residence City ---
-    Chi-squared test: χ² = 4873.20, p = 0.000, dof = 4440, Cramér’s V = 0.561
-
-    --- Age Range vs Residence Province ---
-    Chi-squared test: χ² = 1096.28, p = 0.000, dof = 666, Cramér’s V = 0.266
-
-    --- Age Range vs Italian Residence ---
-    Chi-squared test: χ² = 210.25, p = 0.000, dof = 6, Cramér’s V = 0.285
-
-    --- Sex vs Study Area ---
-    Chi-squared test: χ² = 214.75, p = 0.000, dof = 9, Cramér’s V = 0.288
+    Chi-squared test: χ² = 2092.78, p (raw) = 0.000e+00, p (Bonf.) = 0.000e+00, dof = 36, Cramér’s V = 0.368
 
     --- Study Area vs Study Title ---
-    Chi-squared test: χ² = 1632.05, p = 0.000, dof = 54, Cramér’s V = 0.325
+    Chi-squared test: χ² = 1632.05, p (raw) = 5.224e-306, p (Bonf.) = 1.097e-304, dof = 54, Cramér’s V = 0.325
 
-    --- Study Area vs Residence Province ---
-    Chi-squared test: χ² = 1500.14, p = 0.000, dof = 999, Cramér’s V = 0.254
-
-    --- Study Title vs Residence City ---
-    Chi-squared test: χ² = 4828.69, p = 0.000, dof = 4440, Cramér’s V = 0.558
-
-    --- Study Title vs Residence Province ---
-    Chi-squared test: χ² = 991.30, p = 0.000, dof = 666, Cramér’s V = 0.253
-
-    --- Years Experience vs Residence Province ---
-    Chi-squared test: χ² = 965.34, p = 0.000, dof = 666, Cramér’s V = 0.250
-
-    --- Years Experience vs Italian Residence ---
-    Chi-squared test: χ² = 136.43, p = 0.000, dof = 6, Cramér’s V = 0.230
-
-    --- Residence City vs Residence Province ---
-    Chi-squared test: χ² = 258052.16, p = 0.000, dof = 82140, Cramér’s V = 0.949
-
-    --- Residence City vs Residence Region ---
-    Chi-squared test: χ² = 48702.01, p = 0.000, dof = 14800, Cramér’s V = 0.971
-
-    --- Residence City vs European Residence ---
-    Chi-squared test: χ² = 857.41, p = 0.002, dof = 740, Cramér’s V = 0.576
-
-    --- Residence City vs Italian Residence ---
-    Chi-squared test: χ² = 2409.92, p = 0.000, dof = 740, Cramér’s V = 0.966
-
-    --- Residence Province vs Residence Region ---
-    Chi-squared test: χ² = 51640.00, p = 0.000, dof = 2220, Cramér’s V = 1.000
-
-    --- Residence Province vs European Residence ---
-    Chi-squared test: χ² = 761.27, p = 0.000, dof = 111, Cramér’s V = 0.543
-
-    --- Residence Province vs Italian Residence ---
-    Chi-squared test: χ² = 2392.69, p = 0.000, dof = 111, Cramér’s V = 0.963
-
-    --- Residence Region vs Residence State ---
-    Chi-squared test: χ² = 2392.69, p = 0.000, dof = 640, Cramér’s V = 0.215
-
-    --- Residence Region vs European Residence ---
-    Chi-squared test: χ² = 761.27, p = 0.000, dof = 20, Cramér’s V = 0.543
-
-    --- Residence Region vs Italian Residence ---
-    Chi-squared test: χ² = 2392.69, p = 0.000, dof = 20, Cramér’s V = 0.963
-
-    --- Residence State vs European Residence ---
-    Chi-squared test: χ² = 2582.00, p = 0.000, dof = 32, Cramér’s V = 1.000
-
-    --- Residence State vs Italian Residence ---
-    Chi-squared test: χ² = 2582.00, p = 0.000, dof = 32, Cramér’s V = 1.000
-
-    --- European Residence vs Italian Residence ---
-    Fisher's exact test: χ² = 821.50, p = 0.000, dof = 1, Cramér’s V = 0.564
+    --- Sex vs Study Area ---
+    Chi-squared test: χ² = 214.75, p (raw) = 2.652e-41, p (Bonf.) = 5.570e-40, dof = 9, Cramér’s V = 0.288
 
 2.3 Bias Detection
 ~~~~~~~~~~~~~~~~~~
 Per valutare il livello di Fairness dei modelli addestrati sono state scelte tre metriche: 
 
 - **Demographic Parity**
-    Questa metrica richiede che ciascun gruppo abbia le stesse opportunità di essere assegnato alla classe positiva (Hired=1), indipendentemente da veri o falsi positivi. Un modello accurato potrebbe risultare unfair se i sottogruppi nel test set sono sbilanciati rispetto alla variabile target Hired. Ad esempio, se le donne nel dataset hanno un tasso di assunzione più elevato rispetto agli uomini e il test set riflette questa distribuzione, un modello preciso potrebbe comunque violare la demografica pari opportunità. Tuttavia, se tali sbilanciamenti riflettono bias storici, la metrica individua il perpetuarsi di tali bias da parte del modello.
+    Questa metrica richiede che ciascun gruppo abbia le stesse opportunità di essere assegnato alla classe positiva, indipendentemente da veri o falsi positivi. Un modello accurato potrebbe risultare unfair se i sottogruppi nel test set sono sbilanciati rispetto alla variabile target Hired. Ad esempio, se le donne nel dataset hanno un tasso di assunzione più elevato rispetto agli uomini e il test set riflette questa distribuzione, un modello preciso potrebbe comunque violare la demografica pari opportunità. Tuttavia, se tali sbilanciamenti riflettono bias storici, la metrica individua il perpetuarsi di tali bias da parte del modello.
 - **Equalized Odds**
     Questa metrica garantisce che i tassi di True Positive Rate (TPR) e False Positive Rate (FPR) siano costanti tra i diversi gruppi. Significa che il modello dovrebbe classificare erroneamente candidati non idonei come positivi con uguale probabilità per tutte le categorie, evitando di favorire o penalizzare un particolare sottoinsieme.
 
@@ -600,6 +561,13 @@ Per valutare il livello di Fairness dei modelli addestrati sono state scelte tre
 **Dataset Categorical Attributes Sorting and Encoding**
 
 .. code-block:: python
+
+    columns_type = {}
+    for col in df.columns:
+        if pd.api.types.is_string_dtype(df[col]):
+            columns_type[col] = 'cat'
+        elif pd.api.types.is_numeric_dtype(df[col]):
+            columns_type[col] = 'num'
 
     encoding_mappings = {}
     df_corr = pd.DataFrame(index=df.index)
@@ -955,43 +923,98 @@ I modelli selezionati includono:
 
 .. code-block:: python
 
-    def compute_fairness_metrics(y_true, y_pred, s_test, label=None):
+    records = []
+    for name, y_pred in predictions_df.items():
+        sf_df = pd.DataFrame(s_test.tolist(), columns=sensitive_features)
         mf = MetricFrame(
             metrics={
-                'selection_rate': selection_rate,
+                'sel_rate': selection_rate,
                 'fpr': false_positive_rate,
                 'fnr': false_negative_rate,
                 'count': count
             },
-            y_true=y_true,
+            y_true=y_test,
             y_pred=y_pred,
-            sensitive_features=s_test
+            sensitive_features=sf_df
         )
+        dp_diff   = demographic_parity_difference(y_test, y_pred, sensitive_features=sf_df)
+        eo_diff   = equalized_odds_difference(y_test, y_pred, sensitive_features=sf_df)
+        dp_ratio  = demographic_parity_ratio(y_test, y_pred, sensitive_features=sf_df)
+        eo_ratio  = equalized_odds_ratio(y_test, y_pred, sensitive_features=sf_df)
 
-        dp_diff = demographic_parity_difference(y_true, y_pred, sensitive_features=s_test)
-        eo_diff = equalized_odds_difference(y_true, y_pred, sensitive_features=s_test)
+        for group_val, metrics in mf.by_group.iterrows():
+            records.append({
+                'Model':  name,
+                'Group':  group_val,
+                'Metric': 'sel_rate',
+                'Value':  metrics['sel_rate']
+            })
+            records.append({
+                'Model':  name,
+                'Group':  group_val,
+                'Metric': 'fpr',
+                'Value':  metrics['fpr']
+            })
+            records.append({
+                'Model':  name,
+                'Group':  group_val,
+                'Metric': 'fnr',
+                'Value':  metrics['fnr']
+            })
+            records.append({
+                'Model':  name,
+                'Group':  group_val,
+                'Metric': 'count',
+                'Value':  metrics['count']
+            })
 
-        dp = demographic_parity_ratio(y_true, y_pred, sensitive_features=s_test)
-        eo = equalized_odds_ratio(y_true, y_pred, sensitive_features=s_test)
+        records.append({'Model': name, 'Group': 'OverallDiff',  'Metric': 'dp_diff',   'Value': dp_diff})
+        records.append({'Model': name, 'Group': 'OverallDiff',  'Metric': 'eo_diff',   'Value': eo_diff})
+        records.append({'Model': name, 'Group': 'OverallRatio', 'Metric': 'dp_ratio',  'Value': dp_ratio})
+        records.append({'Model': name, 'Group': 'OverallRatio', 'Metric': 'eo_ratio',  'Value': eo_ratio})
 
-        if label:
-            print(f"=== {label} ===")
+    fair_df = pd.DataFrame(records).round(3)
 
-        print("By group:")
-        print(mf.by_group)
-        print()
-        print("Overall (selection_rate, fpr, fnr, count):")
-        print(mf.overall)
-        print()
-        print(f"Demographic parity difference: {dp_diff:.4f}")
-        print(f"Equalized odds difference:     {eo_diff:.4f}\n")
-        print()
-        print(f"Demographic parity ratio: {dp:.4f}")
-        print(f"Equalized odds ratio:     {eo:.4f}\n")
+    base_models = [
+        m for m in predictions_df.columns
+        if not any(tag in m for tag in ('preprocessed','inprocessed','postprocessed'))
+    ]
 
-        return mf
+    ncols = 3
+    nrows = int(np.ceil(len(base_models) / ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 5, nrows * 4), sharey=True)
+    axes = axes.flatten()
 
-    for name in predictions_df.columns:
-        compute_fairness_metrics(y_test, predictions_df[name], s_test, label=name)
+    metrics_to_plot = [
+        'sel_rate', 'fpr', 'fnr',    # group‐level rates
+        'dp_diff', 'eo_diff',        # overall differences
+        'dp_ratio', 'eo_ratio'       # overall ratios
+    ]
+
+    for ax, base in zip(axes, base_models):
+        sel = fair_df[
+            fair_df['Model'].str.startswith(base) &
+            fair_df['Metric'].isin(metrics_to_plot)
+        ]
+        
+        pivot = sel.pivot_table(index='Metric', columns='Model', values='Value')
+        variants = pivot.columns.tolist()
+        x = np.arange(len(pivot))
+        width = 0.8 / len(variants)
+
+        for i, var in enumerate(variants):
+            label = var.replace(base + '_', '') if var != base else 'Base'
+            ax.bar(x + (i - (len(variants) - 1) / 2) * width, pivot[var], width, label=label)
+
+        ax.set_xticks(x)
+        ax.set_xticklabels(pivot.index, rotation=45, ha='right')
+        ax.set_title(base)
+        ax.legend(fontsize='x-small')
+
+    for ax in axes[len(base_models):]:
+        ax.set_visible(False)
+
+    plt.tight_layout()
+    plt.show()
 
 .. image:: _static/fairness.png

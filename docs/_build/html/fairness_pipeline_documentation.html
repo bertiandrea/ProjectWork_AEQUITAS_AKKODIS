@@ -123,10 +123,9 @@
 <li><p><strong>Study Area.1</strong>: Ambito di studio richiesto (compatibile con Study Area).</p></li>
 <li><p><strong>Linked_search_key</strong>: Codice <cite>RSnn.nnnn</cite> (nn = anno di inserimento, nnnn = numero di ricerche).</p></li>
 </ul>
-<section id="pre-processing">
-<h2>1. Pre-processing<a class="headerlink" href="#pre-processing" title="Permalink to this heading">¶</a></h2>
+<section id="data-cleaning">
+<h2>1. Data Cleaning<a class="headerlink" href="#data-cleaning" title="Permalink to this heading">¶</a></h2>
 <p>Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non desiderate, e applichiamo il remapping definito nel file di configurazione.</p>
-<p><strong>Data Cleaning</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">PATH</span> <span class="o">=</span> <span class="s1">&#39;C:/Users/andre/Desktop/ProjectWork_AEQUITAS_AKKODIS/&#39;</span>
 <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">PATH</span> <span class="o">+</span> <span class="s1">&#39;data/Dataset_2.0_Akkodis.xlsx&#39;</span><span class="p">)</span>
@@ -204,13 +203,20 @@ In base ai dati disponibili, sono stati identificati due possibili obiettivi di 
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>Hired</strong></dt><dd><p>Etichettare la coppia candidato-posizione come positiva o negativa, definendo se il profilo del candidato sia adeguato alle richieste aziendali.</p>
+<dt><strong>Status</strong></dt><dd><p>Etichettare la coppia candidato-posizione come positiva o negativa, definendo se il profilo del candidato sia adeguato alle richieste aziendali.
+In particolare, un candidato viene considerato Positive se risulta in una delle situazioni seguenti:</p>
+<ul>
+<li><p>Il suo Candidate State indica che è stato assunto (Hired), ha ricevuto un’offerta economica (Economic proposal) oppure è arrivato al Qualification Meeting (QM), fase chiave di valutazione avanzata.</p></li>
+<li><p>Il suo ultimo Event_Feedback riporta un riscontro positivo, come un feedback tecnico in diretta (OK (live)), la conferma dell’inizio imminente dell’attività (OK (waiting for departure)) o la conferma esplicita di assunzione (OK (hired)).</p></li>
+<li><p>In qualsiasi altro caso, il profilo viene etichettato Negative, segnalando che non ha soddisfatto i requisiti aziendali a livelli decisionali rilevanti.</p></li>
+</ul>
 </dd>
 </dl>
 </li>
 </ul>
 <p>La prima ipotesi è stata scartata poiché oltre il 90% dei candidati non presenta valori per i campi relativi alla RAL.
-Per distinguere tra candidati idonei e non idonei, è necessario definire una variabile target esplicita. Il dataset originale non contiene una colonna binaria per questo scopo. Pertanto è stata creata la variabile Status, derivata logicamente dalle colonne Candidate State ed Event_Feedback.
+Per distinguere tra candidati idonei e non idonei, è necessario definire una variabile target esplicita, tuttavia il dataset originale non contiene una colonna binaria per questo scopo.
+Pertanto è stata creata la variabile Status, derivata logicamente, in base ai criteri appena mostrati, dalle colonne Candidate State ed Event_Feedback.
 Questa scelta è coerente con l’obiettivo di valutare se i modelli di classificazione rispettino criteri di equità nel processo decisionale di assunzione.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">valid_values</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;status_positive_conditions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -301,8 +307,7 @@ Questa scelta è coerente con l’obiettivo di valutare se i modelli di classifi
 <p>Nel contesto dell’analisi di equità algoritmica, le variabili considerate sensibili sono state individuate sulla base di criteri normativi (es. GDPR) e di rilevanza sociale, con l’obiettivo di monitorarne l’impatto sui tassi di assunzione e prevenire possibili discriminazioni. In particolare, sono state studiate le seguenti caratteristiche protette:</p>
 <ul class="simple">
 <li><dl class="simple">
-<dt><strong>Sesso (Gender)</strong></dt><dd><p>Il dataset presenta una marcata sottorappresentazione delle candidate di sesso femminile (20% del totale). Tuttavia, il tasso di assunzione delle donne risulta superiore a quello degli uomini: l’8,3% contro il 5,3%. Questa differenza potrebbe riflettere una scelta organizzativa volta a incrementare la diversità di genere, oppure la maggiore qualificazione dei profili femminili, come suggerito dalla distribuzione dei titoli di studio (titoli di master e dottorato più frequenti tra le donne).
-Nonostante ciò, analizzando la RAL massima prevista a parità di titolo di studio e anni di esperienza, le donne ricevono offerte economiche lievemente inferiori. In mancanza di informazioni su orari o tipologia contrattuale non è possibile stabilire se si tratti di disparità ingiustificate o di scelte contrattuali differenziate.</p>
+<dt><strong>Sesso (Gender)</strong></dt><dd><p>Il dataset presenta una marcata sottorappresentazione delle candidate di sesso femminile (20% del totale). Tuttavia, il tasso di assunzione delle donne risulta superiore a quello degli uomini: l’8,3% contro il 5,3%. Questa differenza potrebbe riflettere una scelta organizzativa volta a incrementare la diversità di genere, oppure la maggiore qualificazione dei profili femminili.</p>
 </dd>
 </dl>
 </li>
@@ -312,18 +317,18 @@ Nonostante ciò, analizzando la RAL massima prevista a parità di titolo di stud
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>Residenza europea e italiana</strong></dt><dd><p>La residenza in Europa è associata a una probabilità di assunzione superiore rispetto ai residenti extra-UE, probabilmente per motivi di logistica, requisiti legali o presenza di uffici aziendali. All’interno dell’Europa, la residenza in Italia è ulteriormente favorita: il 6% dei residenti italiani viene assunto, contro il 4% dei non residenti. Questa discrepanza permane anche controllando titolo di studio e anni di esperienza, salvo differenze nei range salariali offerti, che risultano più elevati per i non residenti pur a parità di qualifiche.</p>
+<dt><strong>Residenza italiana</strong></dt><dd><p>I candidati con residenza in Italia mostrano una probabilità di assunzione più elevata, probabilmente a causa di fattori logistici, vincoli normativi e della presenza di uffici locali.
+Tuttavia, il numero di non residenti nel nostro campione è esiguo, rendendo impossibile trarre conclusioni significative sul loro tasso di assunzione. Durante la fase successiva di raccolta dati, sarà dunque essenziale aumentare la rappresentatività di questo gruppo per analizzare eventuali disparità.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>Categoria protetta (Protected Category)</strong></dt><dd><p>Gli appartenenti a categorie protette rappresentano soltanto lo 0,6% del campione (18 candidati), un numero troppo esiguo per trarre conclusioni statisticamente significative sul loro tasso di assunzione. In fase di raccolta dati sarà quindi fondamentale aumentare la rappresentatività di questo gruppo per valutare eventuali disparità.</p>
+<dt><strong>Categoria protetta (Protected Category)</strong></dt><dd><p>Gli appartenenti alle categorie protette costituiscono solo lo 0,6 % del campione (18 candidati), un’incidenza troppo bassa per consentire valutazioni statistiche affidabili sul loro esito di selezione. Per stabilire se esistano discriminazioni o differenze sostanziali, anche in questo caso risulta fondamentale aumentare la rappresentatività del gruppo per effettuare una analisi adeguata sulle possibili disparità.</p>
 </dd>
 </dl>
 </li>
 </ul>
-<p>In conclusione, l’analisi delle feature sensibili ha permesso di evidenziare bias potenziali – alcuni forse voluti (ad es. equity di genere), altri non facilmente giustificabili (divario salariale tra uomini e donne, preferenza per residenti italiani).
-Il passo successivo consisterà nell’integrare queste valutazioni all’interno del flusso di sviluppo del modello di selezione, applicando metriche di fairness e strumenti di mitigazione per garantire un processo di assunzione equo e trasparente.</p>
+<p>Il passo successivo consisterà nell’integrare queste valutazioni all’interno del flusso di sviluppo del modello di selezione, applicando metriche di fairness e strumenti di mitigazione per garantire un processo di assunzione equo e trasparente.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cols</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># numero di colonne nella griglia</span>
 <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;sensitive_columns&#39;</span><span class="p">])</span>
 <span class="n">total_plots</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="mi">2</span>
@@ -477,96 +482,54 @@ dtype: float64
 
     <span class="k">return</span> <span class="n">contingency</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">chi2</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">dof</span><span class="p">,</span> <span class="n">cramer_v</span><span class="p">,</span> <span class="n">test_name</span>
 
+<span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">cats</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">columns_type</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="s1">&#39;cat&#39;</span><span class="p">]</span>
+
 <span class="k">for</span> <span class="n">col1</span><span class="p">,</span> <span class="n">col2</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">(</span><span class="n">cats</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">col1</span> <span class="o">==</span> <span class="n">col2</span><span class="p">:</span>
+    <span class="c1"># Skip cause Residence attributes are highly correlated within themselves</span>
+    <span class="k">if</span> <span class="s1">&#39;Residence&#39;</span> <span class="ow">in</span> <span class="n">col1</span> <span class="ow">or</span> <span class="s1">&#39;Residence&#39;</span> <span class="ow">in</span> <span class="n">col2</span><span class="p">:</span>
         <span class="k">continue</span>
 
-    <span class="n">contingency</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">chi2</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">dof</span><span class="p">,</span> <span class="n">cramer_v</span><span class="p">,</span> <span class="n">test_name</span> <span class="o">=</span> <span class="n">compute</span><span class="p">(</span><span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">)</span>
+    <span class="n">contingency</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">chi2</span><span class="p">,</span> <span class="n">p_raw</span><span class="p">,</span> <span class="n">dof</span><span class="p">,</span> <span class="n">cramer_v</span><span class="p">,</span> <span class="n">test_name</span> <span class="o">=</span> <span class="n">compute</span><span class="p">(</span><span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">)</span>
+    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+        <span class="s1">&#39;col1&#39;</span><span class="p">:</span>     <span class="n">col1</span><span class="p">,</span>
+        <span class="s1">&#39;col2&#39;</span><span class="p">:</span>     <span class="n">col2</span><span class="p">,</span>
+        <span class="s1">&#39;chi2&#39;</span><span class="p">:</span>     <span class="n">chi2</span><span class="p">,</span>
+        <span class="s1">&#39;p_raw&#39;</span><span class="p">:</span>    <span class="n">p_raw</span><span class="p">,</span>
+        <span class="s1">&#39;dof&#39;</span><span class="p">:</span>      <span class="n">dof</span><span class="p">,</span>
+        <span class="s1">&#39;cramer_v&#39;</span><span class="p">:</span> <span class="n">cramer_v</span><span class="p">,</span>
+        <span class="s1">&#39;test&#39;</span><span class="p">:</span>     <span class="n">test_name</span>
+    <span class="p">})</span>
+<span class="n">res_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;chi_squared_p_value_threshold&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">cramer_v</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;cramers_v_threshold&#39;</span><span class="p">]:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--- </span><span class="si">{</span><span class="n">col1</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">col2</span><span class="si">}</span><span class="s2"> ---&quot;</span><span class="p">)</span>
-        <span class="c1">#print(&quot;Actual frequencies:&quot;)</span>
-        <span class="c1">#print(contingency)</span>
-        <span class="c1">#print()</span>
-        <span class="c1">#print(&quot;Expected frequencies:&quot;)</span>
-        <span class="c1">#print(pd.DataFrame(expected, index=contingency.index, columns=contingency.columns))</span>
-        <span class="c1">#print()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">test_name</span><span class="si">}</span><span class="s2"> test: χ² = </span><span class="si">{</span><span class="n">chi2</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, p = </span><span class="si">{</span><span class="n">p</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, dof = </span><span class="si">{</span><span class="n">dof</span><span class="si">}</span><span class="s2">, Cramér’s V = </span><span class="si">{</span><span class="n">cramer_v</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">()</span>
+<span class="c1"># Correzione Bonferroni su tutti i p_raw</span>
+<span class="n">reject</span><span class="p">,</span> <span class="n">p_bonf</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">multipletests</span><span class="p">(</span><span class="n">res_df</span><span class="p">[</span><span class="s1">&#39;p_raw&#39;</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bonferroni&#39;</span><span class="p">)</span>
+<span class="n">res_df</span><span class="p">[</span><span class="s1">&#39;p_bonf&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="n">p_bonf</span>
+<span class="n">res_df</span><span class="p">[</span><span class="s1">&#39;significant&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reject</span>
+
+<span class="n">thr_p</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;chi_squared_p_value_threshold&#39;</span><span class="p">]</span>
+<span class="n">thr_v</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;cramers_v_threshold&#39;</span><span class="p">]</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">res_df</span><span class="p">[</span><span class="s1">&#39;p_bonf&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">thr_p</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">res_df</span><span class="p">[</span><span class="s1">&#39;cramer_v&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">thr_v</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">res_df</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;cramer_v&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--- </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;col1&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;col2&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> ---&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> test: &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;χ² = </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;chi2&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;p (raw) = </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;p_raw&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2">, &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;p (Bonf.) = </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;p_bonf&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2">, &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;dof = </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;dof&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;Cramér’s V = </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;cramer_v&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>--- Age Range vs Years Experience ---
-Chi-squared test: χ² = 2092.78, p = 0.000, dof = 36, Cramér’s V = 0.368
-
---- Age Range vs Residence City ---
-Chi-squared test: χ² = 4873.20, p = 0.000, dof = 4440, Cramér’s V = 0.561
-
---- Age Range vs Residence Province ---
-Chi-squared test: χ² = 1096.28, p = 0.000, dof = 666, Cramér’s V = 0.266
-
---- Age Range vs Italian Residence ---
-Chi-squared test: χ² = 210.25, p = 0.000, dof = 6, Cramér’s V = 0.285
-
---- Sex vs Study Area ---
-Chi-squared test: χ² = 214.75, p = 0.000, dof = 9, Cramér’s V = 0.288
+Chi-squared test: χ² = 2092.78, p (raw) = 0.000e+00, p (Bonf.) = 0.000e+00, dof = 36, Cramér’s V = 0.368
 
 --- Study Area vs Study Title ---
-Chi-squared test: χ² = 1632.05, p = 0.000, dof = 54, Cramér’s V = 0.325
+Chi-squared test: χ² = 1632.05, p (raw) = 5.224e-306, p (Bonf.) = 1.097e-304, dof = 54, Cramér’s V = 0.325
 
---- Study Area vs Residence Province ---
-Chi-squared test: χ² = 1500.14, p = 0.000, dof = 999, Cramér’s V = 0.254
-
---- Study Title vs Residence City ---
-Chi-squared test: χ² = 4828.69, p = 0.000, dof = 4440, Cramér’s V = 0.558
-
---- Study Title vs Residence Province ---
-Chi-squared test: χ² = 991.30, p = 0.000, dof = 666, Cramér’s V = 0.253
-
---- Years Experience vs Residence Province ---
-Chi-squared test: χ² = 965.34, p = 0.000, dof = 666, Cramér’s V = 0.250
-
---- Years Experience vs Italian Residence ---
-Chi-squared test: χ² = 136.43, p = 0.000, dof = 6, Cramér’s V = 0.230
-
---- Residence City vs Residence Province ---
-Chi-squared test: χ² = 258052.16, p = 0.000, dof = 82140, Cramér’s V = 0.949
-
---- Residence City vs Residence Region ---
-Chi-squared test: χ² = 48702.01, p = 0.000, dof = 14800, Cramér’s V = 0.971
-
---- Residence City vs European Residence ---
-Chi-squared test: χ² = 857.41, p = 0.002, dof = 740, Cramér’s V = 0.576
-
---- Residence City vs Italian Residence ---
-Chi-squared test: χ² = 2409.92, p = 0.000, dof = 740, Cramér’s V = 0.966
-
---- Residence Province vs Residence Region ---
-Chi-squared test: χ² = 51640.00, p = 0.000, dof = 2220, Cramér’s V = 1.000
-
---- Residence Province vs European Residence ---
-Chi-squared test: χ² = 761.27, p = 0.000, dof = 111, Cramér’s V = 0.543
-
---- Residence Province vs Italian Residence ---
-Chi-squared test: χ² = 2392.69, p = 0.000, dof = 111, Cramér’s V = 0.963
-
---- Residence Region vs Residence State ---
-Chi-squared test: χ² = 2392.69, p = 0.000, dof = 640, Cramér’s V = 0.215
-
---- Residence Region vs European Residence ---
-Chi-squared test: χ² = 761.27, p = 0.000, dof = 20, Cramér’s V = 0.543
-
---- Residence Region vs Italian Residence ---
-Chi-squared test: χ² = 2392.69, p = 0.000, dof = 20, Cramér’s V = 0.963
-
---- Residence State vs European Residence ---
-Chi-squared test: χ² = 2582.00, p = 0.000, dof = 32, Cramér’s V = 1.000
-
---- Residence State vs Italian Residence ---
-Chi-squared test: χ² = 2582.00, p = 0.000, dof = 32, Cramér’s V = 1.000
-
---- European Residence vs Italian Residence ---
-Fisher&#39;s exact test: χ² = 821.50, p = 0.000, dof = 1, Cramér’s V = 0.564
+--- Sex vs Study Area ---
+Chi-squared test: χ² = 214.75, p (raw) = 2.652e-41, p (Bonf.) = 5.570e-40, dof = 9, Cramér’s V = 0.288
 </pre></div>
 </div>
 </section>
@@ -575,7 +538,7 @@ Fisher&#39;s exact test: χ² = 821.50, p = 0.000, dof = 1, Cramér’s V = 0.56
 <p>Per valutare il livello di Fairness dei modelli addestrati sono state scelte tre metriche:</p>
 <ul class="simple">
 <li><dl class="simple">
-<dt><strong>Demographic Parity</strong></dt><dd><p>Questa metrica richiede che ciascun gruppo abbia le stesse opportunità di essere assegnato alla classe positiva (Hired=1), indipendentemente da veri o falsi positivi. Un modello accurato potrebbe risultare unfair se i sottogruppi nel test set sono sbilanciati rispetto alla variabile target Hired. Ad esempio, se le donne nel dataset hanno un tasso di assunzione più elevato rispetto agli uomini e il test set riflette questa distribuzione, un modello preciso potrebbe comunque violare la demografica pari opportunità. Tuttavia, se tali sbilanciamenti riflettono bias storici, la metrica individua il perpetuarsi di tali bias da parte del modello.</p>
+<dt><strong>Demographic Parity</strong></dt><dd><p>Questa metrica richiede che ciascun gruppo abbia le stesse opportunità di essere assegnato alla classe positiva, indipendentemente da veri o falsi positivi. Un modello accurato potrebbe risultare unfair se i sottogruppi nel test set sono sbilanciati rispetto alla variabile target Hired. Ad esempio, se le donne nel dataset hanno un tasso di assunzione più elevato rispetto agli uomini e il test set riflette questa distribuzione, un modello preciso potrebbe comunque violare la demografica pari opportunità. Tuttavia, se tali sbilanciamenti riflettono bias storici, la metrica individua il perpetuarsi di tali bias da parte del modello.</p>
 </dd>
 </dl>
 </li>
@@ -635,7 +598,14 @@ Fisher&#39;s exact test: χ² = 821.50, p = 0.000, dof = 1, Cramér’s V = 0.56
 <section id="training-and-testing">
 <h2>3. Training and Testing<a class="headerlink" href="#training-and-testing" title="Permalink to this heading">¶</a></h2>
 <p><strong>Dataset Categorical Attributes Sorting and Encoding</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">encoding_mappings</span> <span class="o">=</span> <span class="p">{}</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">columns_type</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_string_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]):</span>
+        <span class="n">columns_type</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cat&#39;</span>
+    <span class="k">elif</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]):</span>
+        <span class="n">columns_type</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;num&#39;</span>
+
+<span class="n">encoding_mappings</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">df_corr</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">columns_type</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="s1">&#39;cat&#39;</span><span class="p">:</span>
@@ -980,44 +950,99 @@ I modelli selezionati includono:</p>
 <li><p>Demographic Parity Difference</p></li>
 <li><p>Equalized Odds Difference</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">compute_fairness_metrics</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">s_test</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">y_pred</span> <span class="ow">in</span> <span class="n">predictions_df</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">sf_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">s_test</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="n">sensitive_features</span><span class="p">)</span>
     <span class="n">mf</span> <span class="o">=</span> <span class="n">MetricFrame</span><span class="p">(</span>
         <span class="n">metrics</span><span class="o">=</span><span class="p">{</span>
-            <span class="s1">&#39;selection_rate&#39;</span><span class="p">:</span> <span class="n">selection_rate</span><span class="p">,</span>
+            <span class="s1">&#39;sel_rate&#39;</span><span class="p">:</span> <span class="n">selection_rate</span><span class="p">,</span>
             <span class="s1">&#39;fpr&#39;</span><span class="p">:</span> <span class="n">false_positive_rate</span><span class="p">,</span>
             <span class="s1">&#39;fnr&#39;</span><span class="p">:</span> <span class="n">false_negative_rate</span><span class="p">,</span>
             <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="n">count</span>
         <span class="p">},</span>
-        <span class="n">y_true</span><span class="o">=</span><span class="n">y_true</span><span class="p">,</span>
+        <span class="n">y_true</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span>
         <span class="n">y_pred</span><span class="o">=</span><span class="n">y_pred</span><span class="p">,</span>
-        <span class="n">sensitive_features</span><span class="o">=</span><span class="n">s_test</span>
+        <span class="n">sensitive_features</span><span class="o">=</span><span class="n">sf_df</span>
     <span class="p">)</span>
+    <span class="n">dp_diff</span>   <span class="o">=</span> <span class="n">demographic_parity_difference</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="o">=</span><span class="n">sf_df</span><span class="p">)</span>
+    <span class="n">eo_diff</span>   <span class="o">=</span> <span class="n">equalized_odds_difference</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="o">=</span><span class="n">sf_df</span><span class="p">)</span>
+    <span class="n">dp_ratio</span>  <span class="o">=</span> <span class="n">demographic_parity_ratio</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="o">=</span><span class="n">sf_df</span><span class="p">)</span>
+    <span class="n">eo_ratio</span>  <span class="o">=</span> <span class="n">equalized_odds_ratio</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="o">=</span><span class="n">sf_df</span><span class="p">)</span>
 
-    <span class="n">dp_diff</span> <span class="o">=</span> <span class="n">demographic_parity_difference</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="o">=</span><span class="n">s_test</span><span class="p">)</span>
-    <span class="n">eo_diff</span> <span class="o">=</span> <span class="n">equalized_odds_difference</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="o">=</span><span class="n">s_test</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">group_val</span><span class="p">,</span> <span class="n">metrics</span> <span class="ow">in</span> <span class="n">mf</span><span class="o">.</span><span class="n">by_group</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;Model&#39;</span><span class="p">:</span>  <span class="n">name</span><span class="p">,</span>
+            <span class="s1">&#39;Group&#39;</span><span class="p">:</span>  <span class="n">group_val</span><span class="p">,</span>
+            <span class="s1">&#39;Metric&#39;</span><span class="p">:</span> <span class="s1">&#39;sel_rate&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Value&#39;</span><span class="p">:</span>  <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;sel_rate&#39;</span><span class="p">]</span>
+        <span class="p">})</span>
+        <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;Model&#39;</span><span class="p">:</span>  <span class="n">name</span><span class="p">,</span>
+            <span class="s1">&#39;Group&#39;</span><span class="p">:</span>  <span class="n">group_val</span><span class="p">,</span>
+            <span class="s1">&#39;Metric&#39;</span><span class="p">:</span> <span class="s1">&#39;fpr&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Value&#39;</span><span class="p">:</span>  <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;fpr&#39;</span><span class="p">]</span>
+        <span class="p">})</span>
+        <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;Model&#39;</span><span class="p">:</span>  <span class="n">name</span><span class="p">,</span>
+            <span class="s1">&#39;Group&#39;</span><span class="p">:</span>  <span class="n">group_val</span><span class="p">,</span>
+            <span class="s1">&#39;Metric&#39;</span><span class="p">:</span> <span class="s1">&#39;fnr&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Value&#39;</span><span class="p">:</span>  <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;fnr&#39;</span><span class="p">]</span>
+        <span class="p">})</span>
+        <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;Model&#39;</span><span class="p">:</span>  <span class="n">name</span><span class="p">,</span>
+            <span class="s1">&#39;Group&#39;</span><span class="p">:</span>  <span class="n">group_val</span><span class="p">,</span>
+            <span class="s1">&#39;Metric&#39;</span><span class="p">:</span> <span class="s1">&#39;count&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Value&#39;</span><span class="p">:</span>  <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span>
+        <span class="p">})</span>
 
-    <span class="n">dp</span> <span class="o">=</span> <span class="n">demographic_parity_ratio</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="o">=</span><span class="n">s_test</span><span class="p">)</span>
-    <span class="n">eo</span> <span class="o">=</span> <span class="n">equalized_odds_ratio</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">sensitive_features</span><span class="o">=</span><span class="n">s_test</span><span class="p">)</span>
+    <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;Model&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;Group&#39;</span><span class="p">:</span> <span class="s1">&#39;OverallDiff&#39;</span><span class="p">,</span>  <span class="s1">&#39;Metric&#39;</span><span class="p">:</span> <span class="s1">&#39;dp_diff&#39;</span><span class="p">,</span>   <span class="s1">&#39;Value&#39;</span><span class="p">:</span> <span class="n">dp_diff</span><span class="p">})</span>
+    <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;Model&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;Group&#39;</span><span class="p">:</span> <span class="s1">&#39;OverallDiff&#39;</span><span class="p">,</span>  <span class="s1">&#39;Metric&#39;</span><span class="p">:</span> <span class="s1">&#39;eo_diff&#39;</span><span class="p">,</span>   <span class="s1">&#39;Value&#39;</span><span class="p">:</span> <span class="n">eo_diff</span><span class="p">})</span>
+    <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;Model&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;Group&#39;</span><span class="p">:</span> <span class="s1">&#39;OverallRatio&#39;</span><span class="p">,</span> <span class="s1">&#39;Metric&#39;</span><span class="p">:</span> <span class="s1">&#39;dp_ratio&#39;</span><span class="p">,</span>  <span class="s1">&#39;Value&#39;</span><span class="p">:</span> <span class="n">dp_ratio</span><span class="p">})</span>
+    <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;Model&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;Group&#39;</span><span class="p">:</span> <span class="s1">&#39;OverallRatio&#39;</span><span class="p">,</span> <span class="s1">&#39;Metric&#39;</span><span class="p">:</span> <span class="s1">&#39;eo_ratio&#39;</span><span class="p">,</span>  <span class="s1">&#39;Value&#39;</span><span class="p">:</span> <span class="n">eo_ratio</span><span class="p">})</span>
 
-    <span class="k">if</span> <span class="n">label</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;=== </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> ===&quot;</span><span class="p">)</span>
+<span class="n">fair_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">records</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;By group:&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">mf</span><span class="o">.</span><span class="n">by_group</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Overall (selection_rate, fpr, fnr, count):&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">mf</span><span class="o">.</span><span class="n">overall</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Demographic parity difference: </span><span class="si">{</span><span class="n">dp_diff</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Equalized odds difference:     </span><span class="si">{</span><span class="n">eo_diff</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Demographic parity ratio: </span><span class="si">{</span><span class="n">dp</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Equalized odds ratio:     </span><span class="si">{</span><span class="n">eo</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">base_models</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">predictions_df</span><span class="o">.</span><span class="n">columns</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">tag</span> <span class="ow">in</span> <span class="n">m</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;preprocessed&#39;</span><span class="p">,</span><span class="s1">&#39;inprocessed&#39;</span><span class="p">,</span><span class="s1">&#39;postprocessed&#39;</span><span class="p">))</span>
+<span class="p">]</span>
 
-    <span class="k">return</span> <span class="n">mf</span>
+<span class="n">ncols</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">nrows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">base_models</span><span class="p">)</span> <span class="o">/</span> <span class="n">ncols</span><span class="p">))</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">ncols</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="n">nrows</span> <span class="o">*</span> <span class="mi">4</span><span class="p">),</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 
-<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">predictions_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-    <span class="n">compute_fairness_metrics</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predictions_df</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">s_test</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+<span class="n">metrics_to_plot</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;sel_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;fpr&#39;</span><span class="p">,</span> <span class="s1">&#39;fnr&#39;</span><span class="p">,</span>    <span class="c1"># group‐level rates</span>
+    <span class="s1">&#39;dp_diff&#39;</span><span class="p">,</span> <span class="s1">&#39;eo_diff&#39;</span><span class="p">,</span>        <span class="c1"># overall differences</span>
+    <span class="s1">&#39;dp_ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;eo_ratio&#39;</span>       <span class="c1"># overall ratios</span>
+<span class="p">]</span>
+
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">base</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">base_models</span><span class="p">):</span>
+    <span class="n">sel</span> <span class="o">=</span> <span class="n">fair_df</span><span class="p">[</span>
+        <span class="n">fair_df</span><span class="p">[</span><span class="s1">&#39;Model&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">base</span><span class="p">)</span> <span class="o">&amp;</span>
+        <span class="n">fair_df</span><span class="p">[</span><span class="s1">&#39;Metric&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">metrics_to_plot</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">pivot</span> <span class="o">=</span> <span class="n">sel</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;Metric&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;Model&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s1">&#39;Value&#39;</span><span class="p">)</span>
+    <span class="n">variants</span> <span class="o">=</span> <span class="n">pivot</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pivot</span><span class="p">))</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="mf">0.8</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">variants</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">variants</span><span class="p">):</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">base</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">var</span> <span class="o">!=</span> <span class="n">base</span> <span class="k">else</span> <span class="s1">&#39;Base&#39;</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">variants</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">width</span><span class="p">,</span> <span class="n">pivot</span><span class="p">[</span><span class="n">var</span><span class="p">],</span> <span class="n">width</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">pivot</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;x-small&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">base_models</span><span class="p">):]:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 <img alt="_images/fairness.png" src="_images/fairness.png" />
@@ -1044,7 +1069,7 @@ I modelli selezionati includono:</p>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Fairness Pipeline Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#pre-processing">1. Pre-processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-cleaning">1. Data Cleaning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data-loading-understanding">2. Data Loading &amp; Understanding</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#training-and-testing">3. Training and Testing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#performance-and-fairness-metrics-evaluation">4. Performance and Fairness Metrics Evaluation</a></li>
