@@ -1018,3 +1018,35 @@ I modelli selezionati includono:
     plt.show()
 
 .. image:: _static/fairness.png
+
+
+**Commento Finale sui Risultati di Fairness**
+
+L’analisi comparativa delle tre strategie di mitigazione (pre-processing CorrelationRemover, in-processing GerryFairClassifier e post-processing ThresholdOptimizer) applicate sui sette modelli evidenzia chiaramente i seguenti punti:
+
+1. **Post-processing (TO)**
+
+   * È la leva più efficace nel ridurre sia la **demographic parity difference** che la **equalized odds difference**, avvicinando i valori di *dp\_diff* ed *eo\_diff* a zero in quasi tutti i modelli.
+   * Tuttavia, questo “effetto di livellamento” si ottiene a costo di un leggero peggioramento nei tassi di errore assoluti (*FNR*, *FPR*) e in alcune variazioni del tasso di selezione complessivo.
+
+2. **In-processing (GFC)**
+
+   * Applicato qui solo su Linear Regression, offre benefici intermedi tra pre e post: riduce abbastanza bene *dp\_diff* ma è meno incisivo su *eo\_diff*, e l’overhead di complessità del metodo è maggiore.
+
+3. **Pre-processing (CR)**
+
+   * Garantisce un miglior compromesso: migliora in modo costante la parità demografica e gli equalized odds senza impatti troppo drastici su *FNR*/*FPR*.
+   * L’andamento dei bar verde mostra un equilibrato avvicinamento alle metriche di fairness, pur mantenendo performance di classificazione simili al baseline.
+
+4. **Robustezza dei modelli**
+
+   * **XGBoost** e **Naïve Bayes** partono da valori di disparità già più contenuti e subiscono minori aggiustamenti, risultando i più “intrinsecamente equi” sui dati testati.
+   * **Decision Tree** e **KNN** mostrano i maggiori guadagni di fairness (e parallelamente i maggiori trade-off in termini di errori), confermando che la scelta del modello incide sensibilmente sull’efficacia di ogni strategia.
+
+5. **Scelta Operativa**
+
+   * Se l’obiettivo primario è **massimizzare la fairness** (minimizzare gap tra gruppi), la post-processing è la prima scelta.
+   * Se invece si desidera un bilanciamento più delicato tra fairness e accuratezza, la pre-processing consente di “smussare” i bias senza compromettere eccessivamente le prestazioni.
+
+In conclusione, l’integrazione di queste evidenze nel flusso di produzione dei modelli permette di selezionare la strategia di mitigazione più adatta agli obiettivi aziendali, bilanciando equità, trasparenza e performance predittiva.
+

@@ -1046,6 +1046,40 @@ I modelli selezionati includono:</p>
 </pre></div>
 </div>
 <img alt="_images/fairness.png" src="_images/fairness.png" />
+<p><strong>Commento Finale sui Risultati di Fairness</strong></p>
+<p>L’analisi comparativa delle tre strategie di mitigazione (pre-processing CorrelationRemover, in-processing GerryFairClassifier e post-processing ThresholdOptimizer) applicate sui sette modelli evidenzia chiaramente i seguenti punti:</p>
+<ol class="arabic simple">
+<li><p><strong>Post-processing (TO)</strong></p>
+<ul class="simple">
+<li><p>È la leva più efficace nel ridurre sia la <strong>demographic parity difference</strong> che la <strong>equalized odds difference</strong>, avvicinando i valori di <em>dp_diff</em> ed <em>eo_diff</em> a zero in quasi tutti i modelli.</p></li>
+<li><p>Tuttavia, questo “effetto di livellamento” si ottiene a costo di un leggero peggioramento nei tassi di errore assoluti (<em>FNR</em>, <em>FPR</em>) e in alcune variazioni del tasso di selezione complessivo.</p></li>
+</ul>
+</li>
+<li><p><strong>In-processing (GFC)</strong></p>
+<ul class="simple">
+<li><p>Applicato qui solo su Linear Regression, offre benefici intermedi tra pre e post: riduce abbastanza bene <em>dp_diff</em> ma è meno incisivo su <em>eo_diff</em>, e l’overhead di complessità del metodo è maggiore.</p></li>
+</ul>
+</li>
+<li><p><strong>Pre-processing (CR)</strong></p>
+<ul class="simple">
+<li><p>Garantisce un miglior compromesso: migliora in modo costante la parità demografica e gli equalized odds senza impatti troppo drastici su <em>FNR</em>/<em>FPR</em>.</p></li>
+<li><p>L’andamento dei bar verde mostra un equilibrato avvicinamento alle metriche di fairness, pur mantenendo performance di classificazione simili al baseline.</p></li>
+</ul>
+</li>
+<li><p><strong>Robustezza dei modelli</strong></p>
+<ul class="simple">
+<li><p><strong>XGBoost</strong> e <strong>Naïve Bayes</strong> partono da valori di disparità già più contenuti e subiscono minori aggiustamenti, risultando i più “intrinsecamente equi” sui dati testati.</p></li>
+<li><p><strong>Decision Tree</strong> e <strong>KNN</strong> mostrano i maggiori guadagni di fairness (e parallelamente i maggiori trade-off in termini di errori), confermando che la scelta del modello incide sensibilmente sull’efficacia di ogni strategia.</p></li>
+</ul>
+</li>
+<li><p><strong>Scelta Operativa</strong></p>
+<ul class="simple">
+<li><p>Se l’obiettivo primario è <strong>massimizzare la fairness</strong> (minimizzare gap tra gruppi), la post-processing è la prima scelta.</p></li>
+<li><p>Se invece si desidera un bilanciamento più delicato tra fairness e accuratezza, la pre-processing consente di “smussare” i bias senza compromettere eccessivamente le prestazioni.</p></li>
+</ul>
+</li>
+</ol>
+<p>In conclusione, l’integrazione di queste evidenze nel flusso di produzione dei modelli permette di selezionare la strategia di mitigazione più adatta agli obiettivi aziendali, bilanciando equità, trasparenza e performance predittiva.</p>
 </section>
 </section>
 
