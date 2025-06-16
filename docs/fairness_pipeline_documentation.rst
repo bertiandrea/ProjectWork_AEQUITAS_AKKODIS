@@ -503,7 +503,7 @@ Per identificare le variabili categoriche che potrebbero essere considerate prox
 Per valutare il livello di Fairness dei modelli addestrati sono state scelte tre metriche: 
 
 - **Demographic Parity**
-    Questa metrica richiede che ciascun gruppo abbia le stesse opportunità di essere assegnato alla classe positiva, indipendentemente da veri o falsi positivi. Un modello accurato potrebbe risultare unfair se i sottogruppi nel test set sono sbilanciati rispetto alla variabile target Hired. Ad esempio, se le donne nel dataset hanno un tasso di assunzione più elevato rispetto agli uomini e il test set riflette questa distribuzione, un modello preciso potrebbe comunque violare la demografica pari opportunità. Tuttavia, se tali sbilanciamenti riflettono bias storici, la metrica individua il perpetuarsi di tali bias da parte del modello.
+    Questa metrica richiede che ciascun gruppo abbia le stesse opportunità di essere assegnato alla classe positiva, indipendentemente da veri o falsi positivi. Un modello accurato potrebbe risultare unfair se i sottogruppi nel test set sono sbilanciati rispetto alla variabile target Status.
 - **Equalized Odds**
     Questa metrica garantisce che i tassi di True Positive Rate (TPR) e False Positive Rate (FPR) siano costanti tra i diversi gruppi. Significa che il modello dovrebbe classificare erroneamente candidati non idonei come positivi con uguale probabilità per tutte le categorie, evitando di favorire o penalizzare un particolare sottoinsieme.
 
@@ -1024,19 +1024,19 @@ I modelli selezionati includono:
 
 L’analisi comparativa delle tre strategie di mitigazione (pre-processing CorrelationRemover, in-processing GerryFairClassifier e post-processing ThresholdOptimizer) applicate sui sette modelli evidenzia chiaramente i seguenti punti:
 
-1. **Post-processing (TO)**
 
-   * È la leva più efficace nel ridurre sia la **demographic parity difference** che la **equalized odds difference**, avvicinando i valori di *dp\_diff* ed *eo\_diff* a zero in quasi tutti i modelli.
-   * Tuttavia, questo “effetto di livellamento” si ottiene a costo di un leggero peggioramento nei tassi di errore assoluti (*FNR*, *FPR*) e in alcune variazioni del tasso di selezione complessivo.
+1. **Pre-processing (CorrelationRemover)**
 
-2. **In-processing (GFC)**
+   * Garantisce un miglior compromesso: migliora in modo costante la **Demographic Parity difference** e la **Equalized Odds Difference** senza impatti troppo drastici su *False Negative Rate*/*False Positive Rate*, quindi mantenendo performance di classificazione simili al modello baseline.
 
-   * Applicato qui solo su Linear Regression, offre benefici intermedi tra pre e post: riduce abbastanza bene *dp\_diff* ma è meno incisivo su *eo\_diff*, e l’overhead di complessità del metodo è maggiore.
+2. **In-processing (GerryFairClassifier)**
 
-3. **Pre-processing (CR)**
+   * Applicato qui solo su Linear Regression, offre benefici intermedi tra pre-processing e post-processing: riduce abbastanza bene **Demographic Parity difference** ma è meno incisivo su **Equalized Odds Difference**, e l’overhead di complessità del metodo è maggiore.
 
-   * Garantisce un miglior compromesso: migliora in modo costante la parità demografica e gli equalized odds senza impatti troppo drastici su *FNR*/*FPR*.
-   * L’andamento dei bar verde mostra un equilibrato avvicinamento alle metriche di fairness, pur mantenendo performance di classificazione simili al baseline.
+3. **Post-processing (ThresholdOptimizer)**
+
+   * È la leva più efficace nel ridurre sia la **Demographic Parity difference** che la **Equalized Odds Difference**, avvicinando i loro valori a zero in quasi tutti i modelli.
+   * Tuttavia, questo “effetto di livellamento” si ottiene a costo di un leggero peggioramento nei tassi di errore assoluti (*False Negative Rate*/*False Positive Rate*) e in alcune variazioni del tasso di selezione complessivo.
 
 4. **Robustezza dei modelli**
 
@@ -1045,7 +1045,7 @@ L’analisi comparativa delle tre strategie di mitigazione (pre-processing Corre
 
 5. **Scelta Operativa**
 
-   * Se l’obiettivo primario è **massimizzare la fairness** (minimizzare gap tra gruppi), la post-processing è la prima scelta.
+   * Se l’obiettivo primario è **massimizzare la fairness**, la post-processing è la prima scelta.
    * Se invece si desidera un bilanciamento più delicato tra fairness e accuratezza, la pre-processing consente di “smussare” i bias senza compromettere eccessivamente le prestazioni.
 
 In conclusione, l’integrazione di queste evidenze nel flusso di produzione dei modelli permette di selezionare la strategia di mitigazione più adatta agli obiettivi aziendali, bilanciando equità, trasparenza e performance predittiva.
