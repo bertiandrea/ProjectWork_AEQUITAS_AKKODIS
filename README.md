@@ -16,3 +16,8 @@ Per visualizzarla nel browser, puoi aprire direttamente il file `index.html` gen
 start docs/_build/html/index.html
 ```
 
+Per pubblicare la documentazione su github copiare la build da `docs/_build/html` a `docs`:
+```bash
+xcopy docs\_build\html\* docs\ /E /Y /I
+```
+
