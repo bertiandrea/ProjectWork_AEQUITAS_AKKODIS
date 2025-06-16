@@ -1,5 +1,9 @@
 # ProjectWork_AEQUITAS_AKKODIS
 
+## ReadTheDocs
+
+https://bertiandrea.github.io/ProjectWork_AEQUITAS_AKKODIS/fairness_pipeline_documentation.html
+
 ## Generazione della documentazione con Sphinx
 
 Per generare la documentazione in formato HTML tramite Sphinx, esegui il comando:
@@ -14,5 +18,10 @@ Per visualizzarla nel browser, puoi aprire direttamente il file `index.html` gen
 
 ```bash
 start docs/_build/html/index.html
+```
+
+Per pubblicare la documentazione su github copiare la build da `docs/_build/html` a `docs`:
+```bash
+xcopy docs\_build\html\* docs\ /E /Y /I
 ```
 
