@@ -584,6 +584,33 @@ Per valutare il livello di Fairness dei modelli addestrati sono state scelte tre
         else:
             df_corr[col] = df[col]
 
+**Dataset Preparation**
+
+.. code-block:: python
+
+    n_splits = 2
+    n_repeats = 3
+    cv = RepeatedStratifiedKFold(n_splits=n_splits, n_repeats=n_repeats, random_state=random_seed)
+
+    df = shuffle(df, random_state=random_seed)
+
+    X_train = df.drop(columns=[target])
+    y_train = df[target]
+    s_train = df[sensitive]
+
+    def to_aif360(X_df, y_df, s_df):
+        df = X_df.copy()
+        df[target] = y_df.values
+        df[sensitive] = s_df.values
+            
+        return StandardDataset(
+            df,
+            label_name=target,
+            favorable_classes=[1], # the value considered favorable (1)
+            protected_attribute_names=sensitive,
+            privileged_classes=[[1] for _ in sensitive] # values considered privileged
+        )
+    
 **Models**
 
 Per  garantire  una  panoramica  complessiva  sono  stati  selezionati  modelli  appartenenti  a 
@@ -601,8 +628,69 @@ I modelli selezionati includono:
 - **Modelli Distance-based** 
     - K-Nearest Neighbors 
 - **Rete Neurale**
- 
-3.1 Pre-processing Mitigation
+
+
+3.1 No Mitigation - Baseline
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Models**
+
+.. code-block:: python
+
+    def create_model(seed, input_dim):
+        tf.random.set_seed(seed)
+        model = Sequential()
+        model.add(Dense(128, input_dim=input_dim, activation='relu'))
+        model.add(BatchNormalization())
+        model.add(Dense(128, activation='relu'))
+        model.add(BatchNormalization())
+        model.add(Dense(128, activation='relu'))
+        model.add(BatchNormalization())
+        model.add(Dense(64, activation='relu'))
+        model.add(BatchNormalization())
+        model.add(Dense(1, activation='sigmoid'))
+
+        model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+        return model
+
+    models = {
+        'Logistic Regression': LogisticRegression(),
+        'Linear Regression': LinearRegression(),
+        'Decision Tree': DecisionTreeClassifier(),
+        'Naive Bayes': GaussianNB(),
+        'XGBoost': XGBClassifier(),
+        'KNN': KNeighborsClassifier(),
+        'Neural Network': create_model(random_seed, X_train.shape[1]),
+    }
+
+**Training**
+
+.. code-block:: python
+
+    for fold, (tr_idx, va_idx) in enumerate(cv.split(X_train, y_train, s_train), start=1):
+        X_tr, X_va = X_train.iloc[tr_idx], X_train.iloc[va_idx]
+        y_tr, y_va = y_train.iloc[tr_idx], y_train.iloc[va_idx]
+        s_tr, s_va = s_train.iloc[tr_idx], s_train.iloc[va_idx]
+
+        for model_name, model in models.items():
+            print(f"Training {model_name}...")
+            if model_name == 'Neural Network':
+                model.fit(X_tr, y_tr, epochs=20, batch_size=32, verbose=0)
+                predictions[(fold, model_name)] = model.predict(X_va).ravel()
+            else:
+                model.fit(X_tr, y_tr)
+                predictions[(fold, model_name)] = model.predict(X_va).ravel()
+
+            predictions[(fold, model_name)] = (predictions[(fold, model_name)] > 0.5).astype(int)
+            
+            references[(fold, model_name)] = y_va.values
+            sensitives[(fold, model_name)] = s_va.values
+
+            print(f"{model_name} trained.")
+            print(f"Predictions fold {fold} for {model_name}: {predictions[(fold, model_name)]}")
+
+
+3.2 Pre-processing Mitigation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Pre-processing**
@@ -611,11 +699,7 @@ I modelli selezionati includono:
 
     cr = CorrelationRemover(sensitive_feature_ids=sensitive, alpha=1)
 
-    X_train_cr = cr.fit_transform(train_df)
-    X_train_cr_df = pd.DataFrame(X_train_cr)
-
-    X_test_cr = cr.transform(test_df)
-    X_test_cr_df = pd.DataFrame(X_test_cr)
+    X_train_cr = pd.DataFrame(cr.fit_transform(X_train))
 
 **Normalized Coordinate Plot - Original Vs Transformed Dataset**
 
@@ -723,30 +807,38 @@ I modelli selezionati includono:
         'Naive Bayes': GaussianNB(),
         'XGBoost': XGBClassifier(),
         'KNN': KNeighborsClassifier(),
-        'Neural Network': create_model(random_seed, X_train_cr_df.shape[1]),
+        'Neural Network': create_model(random_seed, X_train_cr.shape[1]),
     }
 
 **Training**
 
 .. code-block:: python
 
-    for model_name, model in models.items():
-        print(f"Training {model_name}...")
-        if model_name == 'Neural Network':
-            model.fit(X_train_cr_df, y_train_split, epochs=10, batch_size=32, verbose=0)
-            predictions[f"{model_name}_preprocessed_cr"] = model.predict(X_test_cr_df).flatten()
-        else:
-            model.fit(X_train_cr_df, y_train_split)
-            predictions[f"{model_name}_preprocessed_cr"] = model.predict(X_test_cr_df)
-
-        if model_name in ['Linear Regression', 'XGBoost', 'Neural Network']:
-            predictions[f"{model_name}_preprocessed_cr"] = (predictions[f"{model_name}_preprocessed_cr"] > 0.5).astype(int)
+    for fold, (train_idx, val_idx) in enumerate(cv.split(X_train_cr, y_train, s_train), start=1):
+        X_tr, X_va = X_train_cr.iloc[train_idx], X_train_cr.iloc[val_idx]
+        y_tr, y_va = y_train.iloc[train_idx], y_train.iloc[val_idx]
+        s_tr, s_va = s_train.iloc[train_idx], s_train.iloc[val_idx]
         
-        print(f"{model_name} trained.")
-        temp = predictions[f"{model_name}_preprocessed_cr"]
-        print(f"Preprocessed predictions for {model_name}: {temp}")
-    
-3.2 In-processing Mitigation
+        for model_name, model in models.items():
+            print(f"Training {model_name}...")
+            if model_name == 'Neural Network':
+                model.fit(X_tr, y_tr, epochs=20, batch_size=32, verbose=0)
+                predictions[(fold, f"{model_name}_preprocessed_cr")] = model.predict(X_va).ravel()
+            else:
+                model.fit(X_tr, y_tr)
+                predictions[(fold, f"{model_name}_preprocessed_cr")] = model.predict(X_va).ravel()
+
+            predictions[(fold, f"{model_name}_preprocessed_cr")] = (predictions[(fold, f"{model_name}_preprocessed_cr")] > 0.5).astype(int)
+            
+            references[(fold, f"{model_name}_preprocessed_cr")] = y_va.values
+            sensitives[(fold, f"{model_name}_preprocessed_cr")] = s_va.values
+            
+            print(f"{model_name} trained.")
+            temp = predictions[(fold, f"{model_name}_preprocessed_cr")]
+            print(f"Preprocessed predictions for {model_name}: {temp}")    
+
+
+3.3 In-processing Mitigation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Models**
@@ -761,25 +853,38 @@ I modelli selezionati includono:
 
 .. code-block:: python
 
-    for model_name, model in models.items():
-        gfc = GerryFairClassifier(
-            C=10,
-            gamma=0.01,
-            fairness_def='FP',
-            max_iters=10,
-            printflag=False,
-            heatmapflag=False,
-            heatmap_iter=10,
-            heatmap_path='.',
-            predictor=model
-        )
-        gfc.fit(train_ds)
-        pred_gfc = gfc.predict(test_ds)
-        predictions[f"{model_name}_inprocessed_gfc"] = pred_gfc.labels.ravel()
-        temp = predictions[f"{model_name}_inprocessed_gfc"]
-        print(f"Inprocessed predictions for {model_name}: {temp}")
+    for fold, (tr_idx, va_idx) in enumerate(cv.split(X_train, y_train, s_train), start=1):
+        X_tr, X_va = X_train.iloc[tr_idx], X_train.iloc[va_idx]
+        y_tr, y_va = y_train.iloc[tr_idx], y_train.iloc[va_idx]
+        s_tr, s_va = s_train.iloc[tr_idx], s_train.iloc[va_idx]
 
-3.3 Post-processing Mitigation
+        train_ds = to_aif360(X_tr, y_tr, s_tr)
+        val_ds = to_aif360(X_va, y_va, s_va)
+
+        for model_name, model in models.items():
+            gfc = GerryFairClassifier(
+                C=10,
+                gamma=0.01,
+                fairness_def='FP',
+                max_iters=10,
+                printflag=False,
+                heatmapflag=False,
+                heatmap_iter=10,
+                heatmap_path='.',
+                predictor=model
+            )
+            gfc.fit(train_ds)
+            pred_gfc = gfc.predict(val_ds)
+            predictions[(fold, f"{model_name}_inprocessed_gfc")] = pred_gfc.labels.ravel()
+
+            references[(fold, f"{model_name}_inprocessed_gfc")] = y_va.values
+            sensitives[(fold, f"{model_name}_inprocessed_gfc")] = s_va.values
+            
+            temp = predictions[(fold, f"{model_name}_inprocessed_gfc")]
+            print(f"Inprocessed predictions for {model_name}: {temp}")
+
+
+3.4 Post-processing Mitigation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Models**
@@ -809,43 +914,49 @@ I modelli selezionati includono:
         'Naive Bayes': GaussianNB(),
         'XGBoost': XGBClassifier(),
         'KNN': KNeighborsClassifier(),
-        'Neural Network': create_model(random_seed, train_df.shape[1]),
+        'Neural Network': create_model(random_seed, X_train.shape[1]),
     }
 
 **Training**
 
 .. code-block:: python
 
-    for model_name, model in models.items():
-        print(f"Training {model_name}...")
-        if model_name == 'Neural Network':
-            model.fit(train_df, y_train_split, epochs=10, batch_size=32, verbose=0)
-            predictions[f"{model_name}_postprocessed_to"] = model.predict(test_df).flatten()
-        else:
-            model.fit(train_df, y_train_split)
-            predictions[f"{model_name}_postprocessed_to"] = model.predict(test_df)
+    for fold, (tr_idx, va_idx) in enumerate(cv.split(X_train, y_train, s_train), start=1):
+        X_tr, X_va = X_train.iloc[tr_idx], X_train.iloc[va_idx]
+        y_tr, y_va = y_train.iloc[tr_idx], y_train.iloc[va_idx]
+        s_tr, s_va = s_train.iloc[tr_idx], s_train.iloc[va_idx]
 
-        print(f"{model_name} trained.")
+        for model_name, model in models.items():
+            print(f"Training {model_name}...")
+            if model_name == 'Neural Network':
+                model.fit(X_tr, y_tr, epochs=10, batch_size=32, verbose=0)
+                predictions[(fold, f"{model_name}_postprocessed_to")] = model.predict(X_va).ravel()
+            else:
+                model.fit(X_tr, y_tr)
+                predictions[(fold, f"{model_name}_postprocessed_to")] = model.predict(X_va).ravel()
 
-**Post-processing**
+            print(f"{model_name} trained.")
 
-.. code-block:: python
+        for model_name, model in models.items():
+            to = ThresholdOptimizer(
+                estimator=model,
+                constraints='demographic_parity',
+                objective='accuracy_score',
+                prefit=True,
+                grid_size=1000,
+                flip=False,
+                predict_method='predict'
+            )
+            to.fit(X_tr, y_tr, sensitive_features=s_tr)
+            pred_to = to.predict(X_va, sensitive_features=s_va)
+            predictions[(fold, f"{model_name}_postprocessed_to")] = pred_to.ravel()
 
-    for model_name, model in models.items():
-        to = ThresholdOptimizer(
-            estimator=model,
-            constraints='demographic_parity',
-            objective='accuracy_score',
-            prefit=True,
-            grid_size=1000,
-            flip=False,
-            predict_method='predict'
-        )
-        to.fit(train_df, y_train_split, sensitive_features=s_train_split)
-        pred_to = to.predict(test_df, sensitive_features=s_test_split)
-        predictions[f"{model_name}_postprocessed_to"] = pred_to.ravel()
-        temp = predictions[f"{model_name}_postprocessed_to"]
-        print(f"Postprocessed predictions for {model_name}: {temp}")
+            references[(fold, f"{model_name}_postprocessed_to")] = y_va.values
+            sensitives[(fold, f"{model_name}_postprocessed_to")] = s_va.values
+            
+            temp = predictions[(fold, f"{model_name}_postprocessed_to")]
+            print(f"Postprocessed predictions for {model_name}: {temp}")
+
 
 4. Performance and Fairness Metrics Evaluation
 ----------------------------------------------
@@ -861,8 +972,13 @@ I modelli selezionati includono:
 .. code-block:: python
 
     records = []
-    for name, y_pred in predictions_df.items():
+    for (fold, name), y_pred in predictions.items():
+
+        y_test = references[fold, name]
+        y_sens = sensitives[fold, name]
+
         scores = {
+            'Fold':       fold,
             'Model':      name,
             'Accuracy':   accuracy_score(y_test, y_pred),
             'Precision':  precision_score(y_test, y_pred),
@@ -876,10 +992,19 @@ I modelli selezionati includono:
 
     df = pd.DataFrame(records).round(3)
 
-    df_long = df.melt(id_vars=['Model','Group'],
+    df = df.melt(
+                    id_vars=['Fold','Model','Group'],
                     value_vars=['Accuracy','Precision','Recall','F1-score','ROC AUC'],
                     var_name='Metric',
-                    value_name='Value')
+                    value_name='Value'
+                    )
+
+    df = (
+        df
+        .groupby(['Model','Group','Metric'])['Value']
+        .agg(['mean','std'])
+        .reset_index()
+    )
 
     base_models = df.loc[df.Group=='Base','Model'].unique()
 
@@ -888,20 +1013,27 @@ I modelli selezionati includono:
     fig, axes = plt.subplots(nrows, ncols, figsize=(ncols*4, nrows*3), sharey=True)
     axes = axes.flatten()
 
-    for ax, base in zip(axes, base_models):
-        sel = df_long[df_long['Model'].str.startswith(base)]
-        
-        pivot = sel.pivot(index='Metric', columns='Model', values='Value')
-        variants = pivot.columns.tolist()
-        x = np.arange(len(pivot))
-        width = 0.8 / len(variants)
+    pivot_mean = df.pivot(index='Metric', columns='Model', values='mean')
+    pivot_std  = df.pivot(index='Metric', columns='Model', values='std')
 
-        for i, var in enumerate(variants):
+    for ax, base in zip(axes, base_models):
+        cols = [c for c in pivot_mean.columns if c.startswith(base)]
+        x = np.arange(len(pivot_mean))
+        width = 0.8 / len(cols)
+
+        for i, var in enumerate(cols):
             label = var.replace(base + '_', '') if var != base else 'Base'
-            ax.bar(x + (i - (len(variants)-1)/2)*width, pivot[var], width, label=label)
+            ax.bar(
+                x + (i - (len(cols)-1)/2)*width,
+                pivot_mean[var],
+                width,
+                yerr=pivot_std[var],
+                capsize=5,
+                label=label
+                )
 
         ax.set_xticks(x)
-        ax.set_xticklabels(pivot.index, rotation=45, ha='right')
+        ax.set_xticklabels(pivot_mean.index, rotation=45, ha='right')
         ax.set_title(base)
         ax.legend(fontsize='x-small')
 
@@ -924,8 +1056,11 @@ I modelli selezionati includono:
 .. code-block:: python
 
     records = []
-    for name, y_pred in predictions_df.items():
+    for (fold, name), y_pred in predictions.items():
+        y_test = references[fold, name]
+        s_test = sensitives[fold, name]
         sf_df = pd.DataFrame(s_test.tolist(), columns=sensitive_features)
+
         mf = MetricFrame(
             metrics={
                 'sel_rate': selection_rate,
@@ -943,40 +1078,30 @@ I modelli selezionati includono:
         eo_ratio  = equalized_odds_ratio(y_test, y_pred, sensitive_features=sf_df)
 
         for group_val, metrics in mf.by_group.iterrows():
-            records.append({
-                'Model':  name,
-                'Group':  group_val,
-                'Metric': 'sel_rate',
-                'Value':  metrics['sel_rate']
-            })
-            records.append({
-                'Model':  name,
-                'Group':  group_val,
-                'Metric': 'fpr',
-                'Value':  metrics['fpr']
-            })
-            records.append({
-                'Model':  name,
-                'Group':  group_val,
-                'Metric': 'fnr',
-                'Value':  metrics['fnr']
-            })
-            records.append({
-                'Model':  name,
-                'Group':  group_val,
-                'Metric': 'count',
-                'Value':  metrics['count']
-            })
+            for metric in ['sel_rate', 'fpr', 'fnr', 'count']:
+                records.append({
+                    'Model':  name,
+                    'Group':  group_val,
+                    'Metric': metric,
+                    'Value':  metrics[metric]
+                })
 
         records.append({'Model': name, 'Group': 'OverallDiff',  'Metric': 'dp_diff',   'Value': dp_diff})
         records.append({'Model': name, 'Group': 'OverallDiff',  'Metric': 'eo_diff',   'Value': eo_diff})
         records.append({'Model': name, 'Group': 'OverallRatio', 'Metric': 'dp_ratio',  'Value': dp_ratio})
         records.append({'Model': name, 'Group': 'OverallRatio', 'Metric': 'eo_ratio',  'Value': eo_ratio})
 
-    fair_df = pd.DataFrame(records).round(3)
+    df = pd.DataFrame(records).round(3)
+
+    df = (
+        df
+        .groupby(['Model','Group','Metric'])['Value']
+        .agg(['mean','std'])
+        .reset_index()
+    )
 
     base_models = [
-        m for m in predictions_df.columns
+        m for m in df['Model'].unique()
         if not any(tag in m for tag in ('preprocessed','inprocessed','postprocessed'))
     ]
 
@@ -985,29 +1110,51 @@ I modelli selezionati includono:
     fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 5, nrows * 4), sharey=True)
     axes = axes.flatten()
 
-    metrics_to_plot = [
-        'sel_rate', 'fpr', 'fnr',    # group‐level rates
-        'dp_diff', 'eo_diff',        # overall differences
-        'dp_ratio', 'eo_ratio'       # overall ratios
+    global_diff = df[
+        (df['Group'] == 'OverallDiff') &
+        (df['Metric'].isin(['dp_diff','eo_diff']))
     ]
 
-    for ax, base in zip(axes, base_models):
-        sel = fair_df[
-            fair_df['Model'].str.startswith(base) &
-            fair_df['Metric'].isin(metrics_to_plot)
-        ]
-        
-        pivot = sel.pivot_table(index='Metric', columns='Model', values='Value')
-        variants = pivot.columns.tolist()
-        x = np.arange(len(pivot))
-        width = 0.8 / len(variants)
+    global_ratio = df[
+        (df['Group'] == 'OverallRatio') &
+        (df['Metric'].isin(['dp_ratio','eo_ratio']))
+    ]
 
-        for i, var in enumerate(variants):
+    group_metrics = df[
+        (df['Metric'].isin(['fnr','fpr','sel_rate'])) &
+        (~df['Group'].isin(['OverallDiff','OverallRatio']))
+    ]
+
+    group_agg = (
+        group_metrics
+        .groupby(['Model','Metric'])[['mean','std']]
+        .mean()                 # media dei mean e media degli std
+        .reset_index()
+    )
+
+    flat = pd.concat([global_diff, global_ratio, group_agg], ignore_index=True)
+
+    pivot_mean = flat.pivot(index='Metric', columns='Model', values='mean')
+    pivot_std  = flat.pivot(index='Metric', columns='Model', values='std')
+        
+    for ax, base in zip(axes, base_models):
+        cols = [c for c in pivot_mean.columns if c.startswith(base)]
+        x = np.arange(len(pivot_mean))
+        width = 0.8 / len(cols)
+
+        for i, var in enumerate(cols):
             label = var.replace(base + '_', '') if var != base else 'Base'
-            ax.bar(x + (i - (len(variants) - 1) / 2) * width, pivot[var], width, label=label)
+            ax.bar(
+                x + (i - (len(cols)-1)/2)*width,
+                pivot_mean[var],
+                width,
+                yerr=pivot_std[var],
+                capsize=5,
+                label=label
+            )
 
         ax.set_xticks(x)
-        ax.set_xticklabels(pivot.index, rotation=45, ha='right')
+        ax.set_xticklabels(pivot_mean.index, rotation=45, ha='right')
         ax.set_title(base)
         ax.legend(fontsize='x-small')
 
