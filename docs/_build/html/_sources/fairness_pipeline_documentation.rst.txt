@@ -1197,3 +1197,59 @@ L’analisi comparativa delle tre strategie di mitigazione (pre-processing Corre
 
 In conclusione, l’integrazione di queste evidenze nel flusso di produzione dei modelli permette di selezionare la strategia di mitigazione più adatta agli obiettivi aziendali, bilanciando equità, trasparenza e performance predittiva.
 
+.. raw:: html
+
+   <div style="overflow-x:auto;">
+
+.. raw:: html
+
+   <div style="width:1500px;">
+
+.. list-table:: Analisi delle strategie di fairness
+   :header-rows: 1
+   :widths: 1 1 1 1 1 1 1 1
+
+   * - Tecnica \ Modello
+     - Decision Tree
+     - KNN
+     - Linear Regression
+     - Logistic Regression
+     - Naive Bayes
+     - Neural Network
+     - XGBoost
+
+   * - Pre-processing
+     - Migliora la **Demographic Parity**, ma complica un po’ gli errori (*FPR*/*FNR*) e gap di **Equalized Odds**.
+     - Leggero peggioramento di **Demographic Parity** e **Equalized Odds**; errori pressoché stabili.
+     - **Demographic Parity** più bilanciata; **Equalized Odds** e tassi di errore simili o in lieve calo.
+     - Piccoli guadagni sulla **Demographic Parity**, ma gap di **Equalized Odds** e *FPR*/*FNR* in lieve aumento.
+     - Fairness generale peggiore; basti guardare il consistente aumento di *FPR*.
+     - **Demographic Parity** ed **Equalized Odds** peggiorano; errori aumentano lievemente.
+     - **Demographic Parity** stabile; **Equalized Odds** stazionario; *FNR* in calo, *FPR* in lieve crescita.
+
+   * - In-processing
+     - —  
+     - —  
+     - Offre il miglior bilanciamento tra **Demographic Parity** e **Equalized Odds**, con errori contenuti.
+     - —  
+     - —  
+     - —  
+     - —  
+
+   * - Post-processing
+     - **Demographic Parity** ulteriormente migliorata; errori (*FPR*/*FNR*) un po’ più alti.
+     - **Demographic Parity** mista; **Equalized Odds** peggiora; errori in lieve aumento.
+     - **Demographic Parity** molto più uniforme; **Equalized Odds** e errori ridotti; selection rate stabile.
+     - **Demographic Parity** e **Equalized Odds** migliorati; *FPR* diminuito; leggeri aumenti di *FNR*.
+     - **Demographic Parity** marginalmente migliorata; **Equalized Odds** peggiora; errori in aumento.
+     - **Demographic Parity** ed **Equalized Odds** leggermente peggiori; selection rate in calo.
+     - Buon compromesso: **Demographic Parity** e **Equalized Odds** più uniformi, errori stabili.
+
+.. raw:: html
+
+   </div>
+
+.. raw:: html
+
+   </div>
+   

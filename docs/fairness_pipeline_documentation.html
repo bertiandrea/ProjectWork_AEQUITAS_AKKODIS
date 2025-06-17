@@ -1217,7 +1217,60 @@ I modelli selezionati includono:</p>
 </li>
 </ol>
 <p>In conclusione, l’integrazione di queste evidenze nel flusso di produzione dei modelli permette di selezionare la strategia di mitigazione più adatta agli obiettivi aziendali, bilanciando equità, trasparenza e performance predittiva.</p>
-</section>
+<div style="overflow-x:auto;"><div style="width:1500px;"><table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Analisi delle strategie di fairness</span><a class="headerlink" href="#id1" title="Link a questa tabella">¶</a></caption>
+<colgroup>
+<col style="width: 12.5%" />
+<col style="width: 12.5%" />
+<col style="width: 12.5%" />
+<col style="width: 12.5%" />
+<col style="width: 12.5%" />
+<col style="width: 12.5%" />
+<col style="width: 12.5%" />
+<col style="width: 12.5%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Tecnica Modello</p></th>
+<th class="head"><p>Decision Tree</p></th>
+<th class="head"><p>KNN</p></th>
+<th class="head"><p>Linear Regression</p></th>
+<th class="head"><p>Logistic Regression</p></th>
+<th class="head"><p>Naive Bayes</p></th>
+<th class="head"><p>Neural Network</p></th>
+<th class="head"><p>XGBoost</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Pre-processing</p></td>
+<td><p>Migliora la <strong>Demographic Parity</strong>, ma complica un po’ gli errori (<em>FPR</em>/<em>FNR</em>) e gap di <strong>Equalized Odds</strong>.</p></td>
+<td><p>Leggero peggioramento di <strong>Demographic Parity</strong> e <strong>Equalized Odds</strong>; errori pressoché stabili.</p></td>
+<td><p><strong>Demographic Parity</strong> più bilanciata; <strong>Equalized Odds</strong> e tassi di errore simili o in lieve calo.</p></td>
+<td><p>Piccoli guadagni sulla <strong>Demographic Parity</strong>, ma gap di <strong>Equalized Odds</strong> e <em>FPR</em>/<em>FNR</em> in lieve aumento.</p></td>
+<td><p>Fairness generale peggiore; basti guardare il consistente aumento di <em>FPR</em>.</p></td>
+<td><p><strong>Demographic Parity</strong> ed <strong>Equalized Odds</strong> peggiorano; errori aumentano lievemente.</p></td>
+<td><p><strong>Demographic Parity</strong> stabile; <strong>Equalized Odds</strong> stazionario; <em>FNR</em> in calo, <em>FPR</em> in lieve crescita.</p></td>
+</tr>
+<tr class="row-odd"><td><p>In-processing</p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+<td><p>Offre il miglior bilanciamento tra <strong>Demographic Parity</strong> e <strong>Equalized Odds</strong>, con errori contenuti.</p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>Post-processing</p></td>
+<td><p><strong>Demographic Parity</strong> ulteriormente migliorata; errori (<em>FPR</em>/<em>FNR</em>) un po’ più alti.</p></td>
+<td><p><strong>Demographic Parity</strong> mista; <strong>Equalized Odds</strong> peggiora; errori in lieve aumento.</p></td>
+<td><p><strong>Demographic Parity</strong> molto più uniforme; <strong>Equalized Odds</strong> e errori ridotti; selection rate stabile.</p></td>
+<td><p><strong>Demographic Parity</strong> e <strong>Equalized Odds</strong> migliorati; <em>FPR</em> diminuito; leggeri aumenti di <em>FNR</em>.</p></td>
+<td><p><strong>Demographic Parity</strong> marginalmente migliorata; <strong>Equalized Odds</strong> peggiora; errori in aumento.</p></td>
+<td><p><strong>Demographic Parity</strong> ed <strong>Equalized Odds</strong> leggermente peggiori; selection rate in calo.</p></td>
+<td><p>Buon compromesso: <strong>Demographic Parity</strong> e <strong>Equalized Odds</strong> più uniformi, errori stabili.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div></section>
 </section>
 
 
