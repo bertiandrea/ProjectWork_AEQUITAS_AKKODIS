@@ -33,69 +33,63 @@
             
   <section id="fairness-pipeline-documentation">
 <h1>Fairness Pipeline Documentation<a class="headerlink" href="#fairness-pipeline-documentation" title="Permalink to this heading">¶</a></h1>
-<p>Akkodis è un’azienda globale che si occupa di consulenza e offre servizi di recruiting e formazione. Dal 2022 fa parte del gruppo Adecco, leader mondiale nel reclutamento di personale. L’azienda si distingue per il suo impegno verso l’inclusività.</p>
-<p><strong>Struttura del Dataset</strong></p>
-<p>Il dataset dell’azienda, precedentemente anonimizzato, presenta più righe per ciascun candidato memorizzato. Per ogni candidato, ogni riga identifica uno step diverso nel processo di recruiting. Le colonne possono essere suddivise in tre macrocategorie:</p>
-<p><strong>ATTRIBUTI del CANDIDATO:</strong></p>
+<p>Akkodis is a global company that provides consulting services and offers recruiting and training services. Since 2022, it has been part of the Adecco Group, the world leader in personnel recruitment. The company stands out for its commitment to inclusivity.</p>
+<p><strong>Dataset Structure</strong></p>
+<p>The company’s dataset, previously anonymized, contains multiple rows for each stored candidate. For each candidate, each row identifies a different step in the recruiting process. The columns can be divided into three macro-categories:</p>
+<p><strong>CANDIDATE ATTRIBUTES:</strong></p>
 <ul class="simple">
-<li><p><strong>ID</strong>: Identificatore univoco.</p></li>
-<li><dl class="simple">
-<dt><strong>Candidate State</strong>: Stato del candidato:</dt><dd><ul>
-<li><p><strong>Imported</strong>: Candidati importati da database esterni (es. AlmaLaurea). Alcuni potrebbero non aver mai risposto ad Akkodis. <cite>Event_Type__Val = CV Request</cite> indica che il recruiter non ha ancora ricevuto il curriculum.</p></li>
-<li><p><strong>First contact</strong>: Primi contatti (normalmente telefonici). Alcuni potrebbero aver interrotto i contatti o avere un curriculum inadeguato (<cite>Event_Feedback = Inadequate CV</cite>).</p></li>
-<li><p><strong>In selection</strong>: Candidati in fase di selezione, sottoposti ai primi colloqui per una posizione lavorativa.</p></li>
-<li><p><strong>QM</strong>: Candidati sottoposti a Qualification Meeting.</p></li>
-<li><p><strong>Economic Proposal</strong>: Candidati che hanno ricevuto una proposta economica.</p></li>
-<li><p><strong>Vivier</strong>: Candidati con competenze non allineate ai requisiti ma valide per opportunità future.</p></li>
-<li><p><strong>Hired</strong>: Candidato assunto dall’azienda cliente.</p></li>
+<li><p><strong>ID</strong>: Unique identifier.</p></li>
+<li><p><strong>Candidate State</strong>: Candidate status:</p>
+<ul>
+<li><p><strong>Imported</strong>: Candidates imported from external databases (e.g., AlmaLaurea). Some may never have responded to Akkodis. <cite>Event_Type__Val = CV Request</cite> indicates that the recruiter has not yet received the résumé.</p></li>
+<li><p><strong>First contact</strong>: Initial contacts (usually by phone). Some may have stopped communication or have an inadequate résumé (<cite>Event_Feedback = Inadequate CV</cite>).</p></li>
+<li><p><strong>In selection</strong>: Candidates in the selection phase, undergoing initial interviews for a job position.</p></li>
+<li><p><strong>QM</strong>: Candidates who have undergone a Qualification Meeting.</p></li>
+<li><p><strong>Economic Proposal</strong>: Candidates who have received an economic offer.</p></li>
+<li><p><strong>Vivier</strong>: Candidates with skills not aligned with the requirements but valid for future opportunities.</p></li>
+<li><p><strong>Hired</strong>: Candidate hired by the client company.</p></li>
 </ul>
-</dd>
-</dl>
 </li>
-<li><p><strong>Age Range</strong>: Range di età del candidato: [&lt; 20], [20 – 25], [26 – 30], [31 – 35], [36 – 40], [40 – 45], [&gt; 45]</p></li>
-<li><p><strong>Residence</strong>: Residenza attuale.</p></li>
-<li><p><strong>Sex</strong>: Sesso del candidato (Male | Female, default: Male).</p></li>
-<li><p><strong>Protected Category</strong>: Indica se il candidato appartiene a categorie protette (Art.1 e Art.18).</p></li>
-<li><p><strong>TAG</strong>: Parole chiave utilizzate dal recruiter.</p></li>
-<li><p><strong>Study Area</strong>: Disciplina accademica di studio.</p></li>
-<li><dl class="simple">
-<dt><strong>Study Title</strong>: Titolo accademico:</dt><dd><ul>
-<li><p>Middle school diploma</p></li>
-<li><p>Professional qualification</p></li>
-<li><p>High school graduation</p></li>
-<li><p>Three-year degree</p></li>
-<li><p>Five-year degree</p></li>
-<li><p>Master’s degree</p></li>
-<li><p>Doctorate</p></li>
+<li><p><strong>Age Range</strong>: Candidate age range: [&lt; 20], [20 – 25], [26 – 30], [31 – 35], [36 – 40], [40 – 45], [&gt; 45]</p></li>
+<li><p><strong>Residence</strong>: Current residence.</p></li>
+<li><p><strong>Sex</strong>: Candidate’s sex (Male | Female, default: Male).</p></li>
+<li><p><strong>Protected Category</strong>: Indicates if the candidate belongs to protected categories (Art.1 and Art.18).</p></li>
+<li><p><strong>TAG</strong>: Keywords used by the recruiter.</p></li>
+<li><p><strong>Study Area</strong>: Academic field of study.</p></li>
+<li><p><strong>Study Title</strong>: Academic qualification:</p>
+<ul>
+<li><p><strong>Middle school diploma</strong></p></li>
+<li><p><strong>Professional qualification</strong></p></li>
+<li><p><strong>High school graduation</strong></p></li>
+<li><p><strong>Three-year degree</strong></p></li>
+<li><p><strong>Five-year degree</strong></p></li>
+<li><p><strong>Master’s degree</strong></p></li>
+<li><p><strong>Doctorate</strong></p></li>
 </ul>
-</dd>
-</dl>
 </li>
-<li><p><strong>Years Experience</strong>: Range di anni di esperienza: [0], [0-1], [1-3], [3-5], [5-7], [7-10], [+10]</p></li>
-<li><p><strong>Sector</strong>: Settore di esperienza.</p></li>
-<li><p><strong>Last Role</strong>: Ultimo ruolo lavorativo o di studio.</p></li>
-<li><p><strong>Year of Insertion</strong>: Anno di inserimento nel database.</p></li>
-<li><p><strong>Year of Recruitment</strong>: Anno di assunzione (solo se <cite>Candidate State = Hired</cite>).</p></li>
-<li><p><strong>Current RAL</strong>: Retribuzione attuale.</p></li>
-<li><p><strong>Expected RAL</strong>: Aspettativa salariale.</p></li>
+<li><p><strong>Years Experience</strong>: Range of years of experience: [0], [0-1], [1-3], [3-5], [5-7], [7-10], [+10]</p></li>
+<li><p><strong>Sector</strong>: Sector of experience.</p></li>
+<li><p><strong>Last Role</strong>: Last job or study role.</p></li>
+<li><p><strong>Year of Insertion</strong>: Year of insertion into the database.</p></li>
+<li><p><strong>Year of Recruitment</strong>: Year of hiring (only if <cite>Candidate State = Hired</cite>).</p></li>
+<li><p><strong>Current RAL</strong>: Current salary.</p></li>
+<li><p><strong>Expected RAL</strong>: Salary expectation.</p></li>
 </ul>
-<p><strong>ATTRIBUTI del PROCESSO:</strong></p>
-<p>Sono relativi ad uno specifico stadio e cambiano per uno stesso candidato man mano che va avanti nel processo di recruiting.</p>
+<p><strong>PROCESS ATTRIBUTES:</strong></p>
+<p>These relate to a specific stage and change for the same candidate as they progress through the recruiting process.</p>
 <ul class="simple">
-<li><dl class="simple">
-<dt><strong>Event_Type__Val</strong>: Tipo di evento/stadio del processo:</dt><dd><ul>
-<li><p><strong>Iniziali</strong>: Commercial note, CV Request, Contact note, Research Association.</p></li>
-<li><p><strong>Centrali</strong>: HR interview, BM interview, Technical interview, Qualification Meeting.</p></li>
-<li><p><strong>Finali</strong>: Candidate notification, Sending SC to customer, Economic proposal, Notify candidate, Inadequate CV.</p></li>
+<li><p><strong>Event_Type__Val</strong>: Type of event/process stage:</p>
+<ul>
+<li><p><strong>Initial</strong>: Commercial note, CV Request, Contact note, Research Association.</p></li>
+<li><p><strong>Central</strong>: HR interview, BM interview, Technical interview, Qualification Meeting.</p></li>
+<li><p><strong>Final</strong>: Candidate notification, Sending SC to customer, Economic proposal, Notify candidate, Inadequate CV.</p></li>
 </ul>
-</dd>
-</dl>
 </li>
-<li><p><strong>Event_Feedback</strong>: Feedback associato all’evento (OK o KO, con eventuali commenti).</p></li>
-<li><p><strong>Overall</strong>: Punteggio del colloquio (solo per eventi centrali).</p></li>
-<li><p><strong>Akkodis Headquarters</strong>: Sede di Akkodis che gestisce il candidato.</p></li>
-<li><dl class="simple">
-<dt>Punteggi assegnati dal recruiter (1–4) durante il colloquio:</dt><dd><ul>
+<li><p><strong>Event_Feedback</strong>: Feedback associated with the event (OK or KO, with possible comments).</p></li>
+<li><p><strong>Overall</strong>: Interview score (only for central events).</p></li>
+<li><p><strong>Akkodis Headquarters</strong>: Akkodis office handling the candidate.</p></li>
+<li><p>Scores assigned by the recruiter (1–4) during the interview:</p>
+<ul>
 <li><p><strong>Technical Skills</strong></p></li>
 <li><p><strong>Standing/Position</strong></p></li>
 <li><p><strong>Communication</strong></p></li>
@@ -103,29 +97,27 @@
 <li><p><strong>Mobility</strong></p></li>
 <li><p><strong>English</strong></p></li>
 </ul>
-</dd>
-</dl>
 </li>
 </ul>
-<p><strong>ATTRIBUTI della POSIZIONE LAVORATIVA:</strong></p>
-<p>Questi campi sono presenti solo se il candidato è stato assunto dalla azienda in questione.</p>
+<p><strong>JOB POSITION ATTRIBUTES:</strong></p>
+<p>These fields are present only if the candidate was hired by the company in question.</p>
 <ul class="simple">
-<li><p><strong>Recruitment Request</strong>: Richiesta aziendale.</p></li>
-<li><p><strong>Assumption Headquarters</strong>: Sede della posizione.</p></li>
-<li><p><strong>Job Family Hiring</strong>: Categoria del ruolo.</p></li>
-<li><p><strong>Job Title Hiring</strong>: Titolo del ruolo.</p></li>
-<li><p><strong>Job Description</strong>: Descrizione del ruolo.</p></li>
-<li><p><strong>Candidate Profile</strong>: Profilo ideale richiesto.</p></li>
-<li><p><strong>Years Experience.1</strong>: Anni di esperienza richiesti (range compatibile con Years Experience del candidato).</p></li>
-<li><p><strong>Minimum RAL</strong>: RAL minima prevista.</p></li>
-<li><p><strong>Maximum RAL</strong>: RAL massima prevista.</p></li>
-<li><p><strong>Study Level</strong>: Livello di studio richiesto (compatibile con Study Title).</p></li>
-<li><p><strong>Study Area.1</strong>: Ambito di studio richiesto (compatibile con Study Area).</p></li>
-<li><p><strong>Linked_search_key</strong>: Codice <cite>RSnn.nnnn</cite> (nn = anno di inserimento, nnnn = numero di ricerche).</p></li>
+<li><p><strong>Recruitment Request</strong>: Company request.</p></li>
+<li><p><strong>Assumption Headquarters</strong>: Office location of the position.</p></li>
+<li><p><strong>Job Family Hiring</strong>: Job category.</p></li>
+<li><p><strong>Job Title Hiring</strong>: Job title.</p></li>
+<li><p><strong>Job Description</strong>: Role description.</p></li>
+<li><p><strong>Candidate Profile</strong>: Ideal profile required.</p></li>
+<li><p><strong>Years Experience.1</strong>: Required years of experience (range compatible with the candidate’s Years Experience).</p></li>
+<li><p><strong>Minimum RAL</strong>: Minimum expected salary.</p></li>
+<li><p><strong>Maximum RAL</strong>: Maximum expected salary.</p></li>
+<li><p><strong>Study Level</strong>: Required education level (compatible with Study Title).</p></li>
+<li><p><strong>Study Area.1</strong>: Required field of study (compatible with Study Area).</p></li>
+<li><p><strong>Linked_search_key</strong>: Code <cite>RSnn.nnnn</cite> (nn = insertion year, nnnn = search number).</p></li>
 </ul>
 <section id="data-cleaning">
 <h2>1. Data Cleaning<a class="headerlink" href="#data-cleaning" title="Permalink to this heading">¶</a></h2>
-<p>Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non desiderate, e applichiamo il remapping definito nel file di configurazione.</p>
+<p>We load the dataset, remove duplicates, unnecessary columns, undesired rows, and apply the remapping defined in the configuration file.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">PATH</span> <span class="o">=</span> <span class="s1">&#39;C:/Users/andre/Desktop/ProjectWork_AEQUITAS_AKKODIS/&#39;</span>
 <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">PATH</span> <span class="o">+</span> <span class="s1">&#39;data/Dataset_2.0_Akkodis.xlsx&#39;</span><span class="p">)</span>
@@ -194,30 +186,30 @@
 <section id="feature-selection">
 <h3>2.1 Feature Selection<a class="headerlink" href="#feature-selection" title="Permalink to this heading">¶</a></h3>
 <p><strong>Target Selection</strong></p>
-<p>L’obiettivo del progetto è lo sviluppo di modelli di AI da impiegare nelle fasi preliminari del processo di recruiting per analizzare i bias emergenti. La scelta del target è stata influenzata dalla struttura del dataset, che contiene informazioni sui candidati e sulle posizioni gestite da Akkodis.
-In base ai dati disponibili, sono stati identificati due possibili obiettivi di predizione automatica:</p>
+<p>The project’s objective is to develop AI models to be used in the preliminary stages of the recruiting process to analyze emerging biases. The choice of target was influenced by the dataset structure, which contains information on candidates and positions managed by Akkodis.
+Based on available data, two possible automatic prediction targets were identified:</p>
 <ul class="simple">
 <li><dl class="simple">
-<dt><strong>RAL</strong></dt><dd><p>Predire la RAL più adeguata al profilo del candidato.</p>
+<dt><strong>RAL</strong></dt><dd><p>Predict the most appropriate salary for the candidate’s profile.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>Status</strong></dt><dd><p>Etichettare la coppia candidato-posizione come positiva o negativa, definendo se il profilo del candidato sia adeguato alle richieste aziendali.
-In particolare, un candidato viene considerato Positive se risulta in una delle situazioni seguenti:</p>
+<dt><strong>Status</strong></dt><dd><p>Label the candidate-position pair as positive or negative, defining whether the candidate’s profile meets the company’s requirements.
+Specifically, a candidate is considered Positive if they meet one of the following situations:</p>
 <ul>
-<li><p>Il suo Candidate State indica che è stato assunto (Hired), ha ricevuto un’offerta economica (Economic proposal) oppure è arrivato al Qualification Meeting (QM), fase chiave di valutazione avanzata.</p></li>
-<li><p>Il suo ultimo Event_Feedback riporta un riscontro positivo, come un feedback tecnico in diretta (OK (live)), la conferma dell’inizio imminente dell’attività (OK (waiting for departure)) o la conferma esplicita di assunzione (OK (hired)).</p></li>
-<li><p>In qualsiasi altro caso, il profilo viene etichettato Negative, segnalando che non ha soddisfatto i requisiti aziendali a livelli decisionali rilevanti.</p></li>
+<li><p>Their Candidate State indicates they have been hired (Hired), received an economic offer (Economic proposal), or reached the Qualification Meeting (QM), a key evaluation phase.</p></li>
+<li><p>Their latest Event_Feedback reports positive feedback, such as a live technical feedback (OK (live)), confirmation of imminent start of activity (OK (waiting for departure)), or explicit hiring confirmation (OK (hired)).</p></li>
+<li><p>In any other case, the profile is labeled Negative, indicating it did not satisfy the company’s requirements at relevant decision-making levels.</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 </ul>
-<p>La prima ipotesi è stata scartata poiché oltre il 90% dei candidati non presenta valori per i campi relativi alla RAL.
-Per distinguere tra candidati idonei e non idonei, è necessario definire una variabile target esplicita, tuttavia il dataset originale non contiene una colonna binaria per questo scopo.
-Pertanto è stata creata la variabile Status, derivata logicamente, in base ai criteri appena mostrati, dalle colonne Candidate State ed Event_Feedback.
-Questa scelta è coerente con l’obiettivo di valutare se i modelli di classificazione rispettino criteri di equità nel processo decisionale di assunzione.</p>
+<p>The first hypothesis was discarded because over 90% of candidates do not have values for the RAL-related fields.
+To distinguish between suitable and unsuitable candidates, it was necessary to define an explicit target variable; however, the original dataset does not contain a binary column for this purpose.
+Therefore, the Status variable was created logically, based on the criteria just shown, from the Candidate State and Event_Feedback columns.
+This choice is consistent with the goal of evaluating whether classification models respect fairness criteria in the hiring decision process.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">valid_values</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;status_positive_conditions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="n">mask</span> <span class="o">|=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">valid_values</span><span class="p">)</span>
@@ -272,7 +264,7 @@ Questa scelta è coerente con l’obiettivo di valutare se i modelli di classifi
 | Status             |              0 | NaN | NaN |      NaN |      NaN |            NaN |            NaN |            NaN |  object |               2 |
 </pre></div>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cols</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># numero di colonne nella griglia</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cols</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;visualize_columns&#39;</span><span class="p">])</span>
 <span class="n">rows</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">cols</span><span class="p">)</span>
 
@@ -294,7 +286,7 @@ Questa scelta è coerente con l’obiettivo di valutare se i modelli di classifi
         <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
     <span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">lookup</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>  <span class="c1"># se vuoi ruotare le etichette</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes</span><span class="p">)):</span>
     <span class="n">axes</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
@@ -304,32 +296,32 @@ Questa scelta è coerente con l’obiettivo di valutare se i modelli di classifi
 </div>
 <img alt="_images/count.png" src="_images/count.png" />
 <p><strong>Sensitive Feature Selection</strong></p>
-<p>Nel contesto dell’analisi di equità algoritmica, le variabili considerate sensibili sono state individuate sulla base di criteri normativi (es. GDPR) e di rilevanza sociale, con l’obiettivo di monitorarne l’impatto sui tassi di assunzione e prevenire possibili discriminazioni. In particolare, sono state studiate le seguenti caratteristiche protette:</p>
+<p>In the context of algorithmic fairness analysis, sensitive variables were identified based on regulatory criteria (e.g., GDPR) and social relevance, with the aim of monitoring their impact on hiring rates and preventing potential discrimination. In particular, the following protected characteristics were studied:</p>
 <ul class="simple">
 <li><dl class="simple">
-<dt><strong>Sesso (Gender)</strong></dt><dd><p>Il dataset presenta una marcata sottorappresentazione delle candidate di sesso femminile (20% del totale). Tuttavia, il tasso di assunzione delle donne risulta superiore a quello degli uomini: l’8,3% contro il 5,3%. Questa differenza potrebbe riflettere una scelta organizzativa volta a incrementare la diversità di genere, oppure la maggiore qualificazione dei profili femminili.</p>
+<dt><strong>Gender</strong></dt><dd><p>The dataset shows a marked underrepresentation of female candidates (20% of the total). However, the hiring rate for women is higher than for men: 8.3% versus 5.3%. This difference could reflect an organizational choice aimed at increasing gender diversity, or the higher qualification of female profiles.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>Fascia di età (Age Range)</strong></dt><dd><p>Più del 65% dei candidati ha meno di 30 anni, di cui il 17% addirittura sotto i 20. Tuttavia, i tassi di assunzione crescono nelle fasce più mature, con un picco tra 31 e 45 anni, a conferma di una preferenza verso professionisti con maggiore esperienza. I candidati più giovani (≤ 26 anni) mostrano performance di assunzione complessivamente inferiori.</p>
+<dt><strong>Age Range</strong></dt><dd><p>More than 65% of candidates are under 30 years old, of which 17% are even under 20. However, hiring rates increase in more mature age ranges, peaking between 31 and 45 years, confirming a preference for professionals with more experience. Younger candidates (≤ 26 years) show overall lower hiring performance.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>Residenza italiana</strong></dt><dd><p>I candidati con residenza in Italia mostrano una probabilità di assunzione più elevata, probabilmente a causa di fattori logistici, vincoli normativi e della presenza di uffici locali.
-Tuttavia, il numero di non residenti nel nostro campione è esiguo, rendendo impossibile trarre conclusioni significative sul loro tasso di assunzione. Durante la fase successiva di raccolta dati, sarà dunque essenziale aumentare la rappresentatività di questo gruppo per analizzare eventuali disparità.</p>
+<dt><strong>Italian Residence</strong></dt><dd><p>Candidates residing in Italy have a higher probability of being hired, likely due to logistical factors, regulatory constraints, and the presence of local offices.
+However, the number of non-residents in our sample is small, making it impossible to draw meaningful conclusions about their hiring rate. During the next data collection phase, it will therefore be essential to increase the representativeness of this group to analyze potential disparities.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>Categoria protetta (Protected Category)</strong></dt><dd><p>Gli appartenenti alle categorie protette costituiscono solo lo 0,6 % del campione (18 candidati), un’incidenza troppo bassa per consentire valutazioni statistiche affidabili sul loro esito di selezione. Per stabilire se esistano discriminazioni o differenze sostanziali, anche in questo caso risulta fondamentale aumentare la rappresentatività del gruppo per effettuare una analisi adeguata sulle possibili disparità.</p>
+<dt><strong>Protected Category</strong></dt><dd><p>Those belonging to protected categories constitute only 0.6% of the sample (18 candidates), an incidence too low to allow reliable statistical evaluations of their selection outcome. To determine whether there are any substantive discrimination or differences, it is also essential in this case to increase the representativeness of the group in order to perform an adequate analysis of possible disparities.</p>
 </dd>
 </dl>
 </li>
 </ul>
-<p>Il passo successivo consisterà nell’integrare queste valutazioni all’interno del flusso di sviluppo del modello di selezione, applicando metriche di fairness e strumenti di mitigazione per garantire un processo di assunzione equo e trasparente.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cols</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># numero di colonne nella griglia</span>
+<p>The next step will consist of integrating these evaluations within the selection model development flow, applying fairness metrics and mitigation tools to ensure an equitable and transparent hiring process.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cols</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;sensitive_columns&#39;</span><span class="p">])</span>
 <span class="n">total_plots</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="mi">2</span>
 <span class="n">rows</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">total_plots</span> <span class="o">/</span> <span class="n">cols</span><span class="p">)</span>
@@ -386,7 +378,7 @@ Tuttavia, il numero di non residenti nel nostro campione è esiguo, rendendo imp
 <section id="proxy-identification">
 <h3>2.2 Proxy Identification<a class="headerlink" href="#proxy-identification" title="Permalink to this heading">¶</a></h3>
 <p><strong>Cross-Correlation Analysis</strong></p>
-<p>Per evidenziare le relazioni tra le colonne del dataset e ottenere una rappresentazione grafica riassuntiva è stata generata una matrice di correlazione, utilizzando la funzione heatmap di Seaborn</p>
+<p>To highlight the relationships between the dataset’s columns and obtain a concise graphical representation, a correlation matrix was generated using Seaborn’s heatmap function.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">columns_type</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_string_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]):</span>
@@ -458,7 +450,7 @@ dtype: float64
 </pre></div>
 </div>
 <p><strong>Chi-squared Test Analysis</strong></p>
-<p>Per identificare le variabili categoriche che potrebbero essere considerate proxy per le feature sensibili, è stata effettuata un’analisi basata sul test del chi-squared.</p>
+<p>To identify the categorical variables that could be considered proxies for sensitive features, an analysis based on the chi-squared test was performed.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">columns_type</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_string_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]):</span>
@@ -502,7 +494,6 @@ dtype: float64
     <span class="p">})</span>
 <span class="n">res_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 
-<span class="c1"># Correzione Bonferroni su tutti i p_raw</span>
 <span class="n">reject</span><span class="p">,</span> <span class="n">p_bonf</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">multipletests</span><span class="p">(</span><span class="n">res_df</span><span class="p">[</span><span class="s1">&#39;p_raw&#39;</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bonferroni&#39;</span><span class="p">)</span>
 <span class="n">res_df</span><span class="p">[</span><span class="s1">&#39;p_bonf&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="n">p_bonf</span>
 <span class="n">res_df</span><span class="p">[</span><span class="s1">&#39;significant&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reject</span>
@@ -535,18 +526,12 @@ Chi-squared test: χ² = 214.75, p (raw) = 2.652e-41, p (Bonf.) = 5.570e-40, dof
 </section>
 <section id="bias-detection">
 <h3>2.3 Bias Detection<a class="headerlink" href="#bias-detection" title="Permalink to this heading">¶</a></h3>
-<p>Per valutare il livello di Fairness dei modelli addestrati sono state scelte tre metriche:</p>
+<p>To evaluate the level of Fairness of the trained models, three metrics were chosen:</p>
 <ul class="simple">
-<li><dl class="simple">
-<dt><strong>Demographic Parity</strong></dt><dd><p>Questa metrica richiede che ciascun gruppo abbia le stesse opportunità di essere assegnato alla classe positiva, indipendentemente da veri o falsi positivi. Un modello accurato potrebbe risultare unfair se i sottogruppi nel test set sono sbilanciati rispetto alla variabile target Status.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><strong>Equalized Odds</strong></dt><dd><p>Questa metrica garantisce che i tassi di True Positive Rate (TPR) e False Positive Rate (FPR) siano costanti tra i diversi gruppi. Significa che il modello dovrebbe classificare erroneamente candidati non idonei come positivi con uguale probabilità per tutte le categorie, evitando di favorire o penalizzare un particolare sottoinsieme.</p>
-</dd>
-</dl>
-</li>
+<li><p><strong>Demographic Parity</strong>
+This metric requires that each group have the same opportunity to be assigned to the positive class, regardless of true or false positives. An accurate model could turn out unfair if the subgroups in the test set are imbalanced with respect to the target variable Status.</p></li>
+<li><p><strong>Equalized Odds</strong>
+This metric guarantees that the True Positive Rate (TPR) and False Positive Rate (FPR) remain constant across different groups. It means that the model should misclassify unqualified candidates as positive with equal probability for all categories, avoiding favoring or penalizing any particular subset.</p></li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cols</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;sensitive_columns&#39;</span><span class="p">])</span>
@@ -574,7 +559,6 @@ Chi-squared test: χ² = 214.75, p (raw) = 2.652e-41, p (Bonf.) = 5.570e-40, dof
     <span class="nb">dir</span> <span class="o">=</span> <span class="n">sr_by_group</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">/</span> <span class="n">sr_by_group</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
     <span class="n">did</span> <span class="o">=</span> <span class="n">sr_by_group</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">sr_by_group</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
 
-    <span class="c1"># Plot dei 4 valori</span>
     <span class="n">metrics</span> <span class="o">=</span> <span class="p">[</span><span class="n">dpr</span><span class="p">,</span> <span class="n">dpd</span><span class="p">,</span> <span class="nb">dir</span><span class="p">,</span> <span class="n">did</span><span class="p">]</span>
     <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Statistical Parity Ratio&#39;</span><span class="p">,</span>
             <span class="s1">&#39;Statistical Parity Difference&#39;</span><span class="p">,</span>
@@ -647,41 +631,31 @@ Chi-squared test: χ² = 214.75, p (raw) = 2.652e-41, p (Bonf.) = 5.570e-40, dof
 </pre></div>
 </div>
 <p><strong>Models</strong></p>
-<p>Per  garantire  una  panoramica  complessiva  sono  stati  selezionati  modelli  appartenenti  a
-famiglie  algoritmiche  diverse,  includendo  modelli  lineari,  probabilistici,  ad  albero  e  reti
-neurali. L’obiettivo è confrontare i risultati e mettere in relazione performance e fairness.
-I modelli selezionati includono:</p>
+<p>To ensure a comprehensive overview, models belonging to different algorithmic families were selected, including linear, probabilistic, tree-based, and neural network models.
+The objective is to compare the results and relate performance to fairness. The selected models include:</p>
 <ul class="simple">
-<li><dl class="simple">
-<dt><strong>Modelli Lineari</strong></dt><dd><ul>
+<li><p><strong>Linear Models</strong></p>
+<ul>
 <li><p>Linear Regression</p></li>
 <li><p>Logistic Regression</p></li>
 </ul>
-</dd>
-</dl>
 </li>
-<li><dl class="simple">
-<dt><strong>Modelli Probabilistici</strong></dt><dd><ul>
+<li><p><strong>Probabilistic Models</strong></p>
+<ul>
 <li><p>Gaussian Naïve Bayes</p></li>
 </ul>
-</dd>
-</dl>
 </li>
-<li><dl class="simple">
-<dt><strong>Modelli Tree-based</strong></dt><dd><ul>
+<li><p><strong>Tree-based Models</strong></p>
+<ul>
 <li><p>Decision Tree</p></li>
 </ul>
-</dd>
-</dl>
 </li>
-<li><dl class="simple">
-<dt><strong>Modelli Distance-based</strong></dt><dd><ul>
+<li><p><strong>Distance-based Models</strong></p>
+<ul>
 <li><p>K-Nearest Neighbors</p></li>
 </ul>
-</dd>
-</dl>
 </li>
-<li><p><strong>Rete Neurale</strong></p></li>
+<li><p><strong>Neural Network</strong></p></li>
 </ul>
 <section id="no-mitigation-baseline">
 <h3>3.1 No Mitigation - Baseline<a class="headerlink" href="#no-mitigation-baseline" title="Permalink to this heading">¶</a></h3>
@@ -1146,7 +1120,7 @@ I modelli selezionati includono:</p>
 <span class="n">group_agg</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">group_metrics</span>
     <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;Model&#39;</span><span class="p">,</span><span class="s1">&#39;Metric&#39;</span><span class="p">])[[</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span><span class="s1">&#39;std&#39;</span><span class="p">]]</span>
-    <span class="o">.</span><span class="n">mean</span><span class="p">()</span>                 <span class="c1"># media dei mean e media degli std</span>
+    <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
     <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 <span class="p">)</span>
 
@@ -1184,41 +1158,42 @@ I modelli selezionati includono:</p>
 </pre></div>
 </div>
 <img alt="_images/fairness.png" src="_images/fairness.png" />
-<p><strong>Commento Finale sui Risultati di Fairness</strong></p>
-<p>L’analisi comparativa delle tre strategie di mitigazione (pre-processing CorrelationRemover, in-processing GerryFairClassifier e post-processing ThresholdOptimizer) applicate sui sette modelli evidenzia chiaramente i seguenti punti:</p>
-<ol class="arabic simple">
+<p><strong>Final Commentary on Fairness Results</strong></p>
+<p>The comparative analysis of the three mitigation strategies (pre-processing with CorrelationRemover, in-processing with GerryFairClassifier and post-processing with ThresholdOptimizer) applied to the seven models clearly highlights the following points:</p>
+<ol class="arabic">
 <li><p><strong>Pre-processing (CorrelationRemover)</strong></p>
 <ul class="simple">
-<li><p>Garantisce un miglior compromesso: migliora in modo costante la <strong>Demographic Parity difference</strong> e la <strong>Equalized Odds Difference</strong> senza impatti troppo drastici su <em>False Negative Rate</em>/<em>False Positive Rate</em>, quindi mantenendo performance di classificazione simili al modello baseline.</p></li>
+<li><p>Ensures a better compromise: it consistently improves the <strong>Demographic Parity difference</strong> and the <strong>Equalized Odds Difference</strong> without overly drastic impacts on <em>False Negative Rate</em>/<em>False Positive Rate</em>, thus maintaining classification performance similar to the baseline model.</p></li>
 </ul>
 </li>
 <li><p><strong>In-processing (GerryFairClassifier)</strong></p>
 <ul class="simple">
-<li><p>Applicato qui solo su Linear Regression, offre benefici intermedi tra pre-processing e post-processing: riduce abbastanza bene <strong>Demographic Parity difference</strong> ma è meno incisivo su <strong>Equalized Odds Difference</strong>, e l’overhead di complessità del metodo è maggiore.</p></li>
+<li><p>Applied here only to Linear Regression, it offers intermediate benefits between pre-processing and post-processing: it reduces the <strong>Demographic Parity difference</strong> quite well but is less effective on the <strong>Equalized Odds Difference</strong>, and the method’s complexity overhead is higher.</p></li>
 </ul>
 </li>
 <li><p><strong>Post-processing (ThresholdOptimizer)</strong></p>
 <ul class="simple">
-<li><p>È la leva più efficace nel ridurre sia la <strong>Demographic Parity difference</strong> che la <strong>Equalized Odds Difference</strong>, avvicinando i loro valori a zero in quasi tutti i modelli.</p></li>
-<li><p>Tuttavia, questo “effetto di livellamento” si ottiene a costo di un leggero peggioramento nei tassi di errore assoluti (<em>False Negative Rate</em>/<em>False Positive Rate</em>) e in alcune variazioni del tasso di selezione complessivo.</p></li>
+<li><p>It is the most effective lever for reducing both the <strong>Demographic Parity difference</strong> and the <strong>Equalized Odds Difference</strong>, bringing their values close to zero in almost all models.</p></li>
+<li><p>However, this “flattening effect” is achieved at the cost of a slight worsening in absolute error rates (<em>False Negative Rate</em>/<em>False Positive Rate</em>) and some variation in the overall selection rate.</p></li>
 </ul>
 </li>
-<li><p><strong>Robustezza dei modelli</strong></p>
+<li><p><strong>Model Robustness</strong></p>
 <ul class="simple">
-<li><p><strong>XGBoost</strong> e <strong>Naïve Bayes</strong> partono da valori di disparità già più contenuti e subiscono minori aggiustamenti, risultando i più “intrinsecamente equi” sui dati testati.</p></li>
-<li><p><strong>Decision Tree</strong> e <strong>KNN</strong> mostrano i maggiori guadagni di fairness (e parallelamente i maggiori trade-off in termini di errori), confermando che la scelta del modello incide sensibilmente sull’efficacia di ogni strategia.</p></li>
+<li><p><strong>XGBoost</strong> and <strong>Naïve Bayes</strong> start from lower disparity values and undergo smaller adjustments, making them the most “intrinsically fair” on the tested data.</p></li>
+<li><p><strong>Decision Tree</strong> and <strong>KNN</strong> show the greatest fairness gains (and, correspondingly, the greatest trade-offs in error rates).</p></li>
 </ul>
+<p>Both of these findings confirm that the choice of model significantly influences the effectiveness of each mitigation strategy.</p>
 </li>
-<li><p><strong>Scelta Operativa</strong></p>
+<li><p><strong>Operational Choice</strong></p>
 <ul class="simple">
-<li><p>Se l’obiettivo primario è <strong>massimizzare la fairness</strong>, la post-processing è la prima scelta.</p></li>
-<li><p>Se invece si desidera un bilanciamento più delicato tra fairness e accuratezza, la pre-processing consente di “smussare” i bias senza compromettere eccessivamente le prestazioni.</p></li>
+<li><p>If the primary objective is to <strong>maximize fairness</strong>, post-processing should be the first choice.</p></li>
+<li><p>If instead you desire a more delicate <strong>balance between fairness and accuracy</strong>, pre-processing allows you to “smooth out” biases without excessively compromising performance.</p></li>
 </ul>
 </li>
 </ol>
-<p>In conclusione, l’integrazione di queste evidenze nel flusso di produzione dei modelli permette di selezionare la strategia di mitigazione più adatta agli obiettivi aziendali, bilanciando equità, trasparenza e performance predittiva.</p>
+<p>In conclusion, integrating these insights into the model production workflow enables the selection of the mitigation strategy best suited to business objectives, balancing fairness, transparency, and predictive performance.</p>
 <div style="overflow-x:auto;"><div style="width:1500px;"><table class="docutils align-default" id="id1">
-<caption><span class="caption-text">Analisi delle strategie di fairness</span><a class="headerlink" href="#id1" title="Link a questa tabella">¶</a></caption>
+<caption><span class="caption-text">Fairness Strategies Analysis</span><a class="headerlink" href="#id1" title="Link a questa tabella">¶</a></caption>
 <colgroup>
 <col style="width: 12.5%" />
 <col style="width: 12.5%" />
@@ -1230,7 +1205,7 @@ I modelli selezionati includono:</p>
 <col style="width: 12.5%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>Tecnica Modello</p></th>
+<tr class="row-odd"><th class="head"><p>Technique / Model</p></th>
 <th class="head"><p>Decision Tree</p></th>
 <th class="head"><p>KNN</p></th>
 <th class="head"><p>Linear Regression</p></th>
@@ -1242,31 +1217,31 @@ I modelli selezionati includono:</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Pre-processing</p></td>
-<td><p>Migliora la <strong>Demographic Parity</strong>, ma complica un po’ gli errori (<em>FPR</em>/<em>FNR</em>) e gap di <strong>Equalized Odds</strong>.</p></td>
-<td><p>Leggero peggioramento di <strong>Demographic Parity</strong> e <strong>Equalized Odds</strong>; errori pressoché stabili.</p></td>
-<td><p><strong>Demographic Parity</strong> più bilanciata; <strong>Equalized Odds</strong> e tassi di errore simili o in lieve calo.</p></td>
-<td><p>Piccoli guadagni sulla <strong>Demographic Parity</strong>, ma gap di <strong>Equalized Odds</strong> e <em>FPR</em>/<em>FNR</em> in lieve aumento.</p></td>
-<td><p>Fairness generale peggiore; basti guardare il consistente aumento di <em>FPR</em>.</p></td>
-<td><p><strong>Demographic Parity</strong> ed <strong>Equalized Odds</strong> peggiorano; errori aumentano lievemente.</p></td>
-<td><p><strong>Demographic Parity</strong> stabile; <strong>Equalized Odds</strong> stazionario; <em>FNR</em> in calo, <em>FPR</em> in lieve crescita.</p></td>
+<td><p>Improves <strong>Demographic Parity</strong> and <strong>Equalized Odds</strong>; <em>FNR</em> increases and <em>FPR</em> increases.</p></td>
+<td><p><strong>Demographic Parity</strong> mixed; <strong>Equalized Odds</strong> mixed; <em>FNR</em> increases and <em>FPR</em> increases.</p></td>
+<td><p><strong>Demographic Parity</strong> improves; <strong>Equalized Odds</strong> mixed; <em>FNR</em> decreases and <em>FPR</em> decreases.</p></td>
+<td><p><strong>Demographic Parity</strong> mixed; <strong>Equalized Odds</strong> improves; <em>FNR</em> increases and <em>FPR</em> increases.</p></td>
+<td><p><strong>Demographic Parity</strong> mixed; <strong>Equalized Odds</strong> mixed; <em>FNR</em> decreases and <em>FPR</em> increases significantly.</p></td>
+<td><p><strong>Demographic Parity</strong> worsens; <strong>Equalized Odds</strong> worsens; <em>FNR</em> increases and <em>FPR</em> increases.</p></td>
+<td><p><strong>Demographic Parity</strong> worsens; <strong>Equalized Odds</strong> mixed; <em>FNR</em> decreases and <em>FPR</em> decreases.</p></td>
 </tr>
 <tr class="row-odd"><td><p>In-processing</p></td>
 <td><p>—</p></td>
 <td><p>—</p></td>
-<td><p>Offre il miglior bilanciamento tra <strong>Demographic Parity</strong> e <strong>Equalized Odds</strong>, con errori contenuti.</p></td>
+<td><p>Offers no clear improvement in <strong>Demographic Parity</strong> or <strong>Equalized Odds</strong>; <em>FNR</em> and <em>FPR</em> stable.</p></td>
 <td><p>—</p></td>
 <td><p>—</p></td>
 <td><p>—</p></td>
 <td><p>—</p></td>
 </tr>
 <tr class="row-even"><td><p>Post-processing</p></td>
-<td><p><strong>Demographic Parity</strong> ulteriormente migliorata; errori (<em>FPR</em>/<em>FNR</em>) un po’ più alti.</p></td>
-<td><p><strong>Demographic Parity</strong> mista; <strong>Equalized Odds</strong> peggiora; errori in lieve aumento.</p></td>
-<td><p><strong>Demographic Parity</strong> molto più uniforme; <strong>Equalized Odds</strong> e errori ridotti; selection rate stabile.</p></td>
-<td><p><strong>Demographic Parity</strong> e <strong>Equalized Odds</strong> migliorati; <em>FPR</em> diminuito; leggeri aumenti di <em>FNR</em>.</p></td>
-<td><p><strong>Demographic Parity</strong> marginalmente migliorata; <strong>Equalized Odds</strong> peggiora; errori in aumento.</p></td>
-<td><p><strong>Demographic Parity</strong> ed <strong>Equalized Odds</strong> leggermente peggiori; selection rate in calo.</p></td>
-<td><p>Buon compromesso: <strong>Demographic Parity</strong> e <strong>Equalized Odds</strong> più uniformi, errori stabili.</p></td>
+<td><p>Improves <strong>Demographic Parity</strong> and <strong>Equalized Odds</strong>; <em>FNR</em> increases and <em>FPR</em> decreases.</p></td>
+<td><p><strong>Demographic Parity</strong> mixed; <strong>Equalized Odds</strong> mixed; <em>FNR</em> decreases and <em>FPR</em> increases.</p></td>
+<td><p><strong>Demographic Parity</strong> improves; <strong>Equalized Odds</strong> improves; <em>FNR</em> decreases and <em>FPR</em> decreases.</p></td>
+<td><p><strong>Demographic Parity</strong> improves; <strong>Equalized Odds</strong> improves; <em>FNR</em> increases and <em>FPR</em> increases.</p></td>
+<td><p><strong>Demographic Parity</strong> mixed; <strong>Equalized Odds</strong> mixed; <em>FNR</em> increases and <em>FPR</em> increases.</p></td>
+<td><p><strong>Demographic Parity</strong> worsens; <strong>Equalized Odds</strong> worsens; <em>FNR</em> increases and <em>FPR</em> increases.</p></td>
+<td><p>Improves <strong>Demographic Parity</strong>; <strong>Equalized Odds</strong> stable; <em>FNR</em> increases and <em>FPR</em> decreases.</p></td>
 </tr>
 </tbody>
 </table>

@@ -1,83 +1,90 @@
 Fairness Pipeline Documentation
 ===============================
-Akkodis è un’azienda globale che si occupa di consulenza e offre servizi di recruiting e formazione. Dal 2022 fa parte del gruppo Adecco, leader mondiale nel reclutamento di personale. L’azienda si distingue per il suo impegno verso l’inclusività.
+Akkodis is a global company that provides consulting services and offers recruiting and training services. Since 2022, it has been part of the Adecco Group, the world leader in personnel recruitment. The company stands out for its commitment to inclusivity.
 
-**Struttura del Dataset**
+**Dataset Structure**
 
-Il dataset dell’azienda, precedentemente anonimizzato, presenta più righe per ciascun candidato memorizzato. Per ogni candidato, ogni riga identifica uno step diverso nel processo di recruiting. Le colonne possono essere suddivise in tre macrocategorie:
+The company’s dataset, previously anonymized, contains multiple rows for each stored candidate. For each candidate, each row identifies a different step in the recruiting process. The columns can be divided into three macro-categories:
 
-**ATTRIBUTI del CANDIDATO:**
+**CANDIDATE ATTRIBUTES:**
 
-- **ID**: Identificatore univoco.
-- **Candidate State**: Stato del candidato:
-    - **Imported**: Candidati importati da database esterni (es. AlmaLaurea). Alcuni potrebbero non aver mai risposto ad Akkodis. `Event_Type__Val = CV Request` indica che il recruiter non ha ancora ricevuto il curriculum.
-    - **First contact**: Primi contatti (normalmente telefonici). Alcuni potrebbero aver interrotto i contatti o avere un curriculum inadeguato (`Event_Feedback = Inadequate CV`).
-    - **In selection**: Candidati in fase di selezione, sottoposti ai primi colloqui per una posizione lavorativa.
-    - **QM**: Candidati sottoposti a Qualification Meeting.
-    - **Economic Proposal**: Candidati che hanno ricevuto una proposta economica.
-    - **Vivier**: Candidati con competenze non allineate ai requisiti ma valide per opportunità future.
-    - **Hired**: Candidato assunto dall’azienda cliente.
-- **Age Range**: Range di età del candidato: [< 20], [20 – 25], [26 – 30], [31 – 35], [36 – 40], [40 – 45], [> 45] 
-- **Residence**: Residenza attuale.
-- **Sex**: Sesso del candidato (Male | Female, default: Male).
-- **Protected Category**: Indica se il candidato appartiene a categorie protette (Art.1 e Art.18).
-- **TAG**: Parole chiave utilizzate dal recruiter.
-- **Study Area**: Disciplina accademica di studio.
-- **Study Title**: Titolo accademico:
-    - Middle school diploma
-    - Professional qualification
-    - High school graduation
-    - Three-year degree
-    - Five-year degree
-    - Master’s degree
-    - Doctorate
-- **Years Experience**: Range di anni di esperienza: [0], [0-1], [1-3], [3-5], [5-7], [7-10], [+10] 
-- **Sector**: Settore di esperienza.
-- **Last Role**: Ultimo ruolo lavorativo o di studio.
-- **Year of Insertion**: Anno di inserimento nel database.
-- **Year of Recruitment**: Anno di assunzione (solo se `Candidate State = Hired`).
-- **Current RAL**: Retribuzione attuale.
-- **Expected RAL**: Aspettativa salariale.
- 
-**ATTRIBUTI del PROCESSO:** 
+- **ID**: Unique identifier.
+- **Candidate State**: Candidate status:
 
-Sono relativi ad uno specifico stadio e cambiano per uno stesso candidato man mano che va avanti nel processo di recruiting.
+  - **Imported**: Candidates imported from external databases (e.g., AlmaLaurea). Some may never have responded to Akkodis. `Event_Type__Val = CV Request` indicates that the recruiter has not yet received the résumé.
+  - **First contact**: Initial contacts (usually by phone). Some may have stopped communication or have an inadequate résumé (`Event_Feedback = Inadequate CV`).
+  - **In selection**: Candidates in the selection phase, undergoing initial interviews for a job position.
+  - **QM**: Candidates who have undergone a Qualification Meeting.
+  - **Economic Proposal**: Candidates who have received an economic offer.
+  - **Vivier**: Candidates with skills not aligned with the requirements but valid for future opportunities.
+  - **Hired**: Candidate hired by the client company.
 
-- **Event_Type__Val**: Tipo di evento/stadio del processo:
-    - **Iniziali**: Commercial note, CV Request, Contact note, Research Association.
-    - **Centrali**: HR interview, BM interview, Technical interview, Qualification Meeting.
-    - **Finali**: Candidate notification, Sending SC to customer, Economic proposal, Notify candidate, Inadequate CV.
-- **Event_Feedback**: Feedback associato all’evento (OK o KO, con eventuali commenti).
-- **Overall**: Punteggio del colloquio (solo per eventi centrali).
-- **Akkodis Headquarters**: Sede di Akkodis che gestisce il candidato.
-- Punteggi assegnati dal recruiter (1–4) durante il colloquio:
-    - **Technical Skills**
-    - **Standing/Position**
-    - **Communication**
-    - **Dynamism**
-    - **Mobility**
-    - **English**
+- **Age Range**: Candidate age range: \[< 20], \[20 – 25], \[26 – 30], \[31 – 35], \[36 – 40], \[40 – 45], \[> 45]
+- **Residence**: Current residence.
+- **Sex**: Candidate’s sex (Male | Female, default: Male).
+- **Protected Category**: Indicates if the candidate belongs to protected categories (Art.1 and Art.18).
+- **TAG**: Keywords used by the recruiter.
+- **Study Area**: Academic field of study.
+- **Study Title**: Academic qualification:
 
-**ATTRIBUTI della POSIZIONE LAVORATIVA:** 
+  - **Middle school diploma**
+  - **Professional qualification**
+  - **High school graduation**
+  - **Three-year degree**
+  - **Five-year degree**
+  - **Master’s degree**
+  - **Doctorate**
 
-Questi campi sono presenti solo se il candidato è stato assunto dalla azienda in questione. 
+- **Years Experience**: Range of years of experience: \[0], \[0-1], \[1-3], \[3-5], \[5-7], \[7-10], \[+10]
+- **Sector**: Sector of experience.
+- **Last Role**: Last job or study role.
+- **Year of Insertion**: Year of insertion into the database.
+- **Year of Recruitment**: Year of hiring (only if `Candidate State = Hired`).
+- **Current RAL**: Current salary.
+- **Expected RAL**: Salary expectation.
 
-- **Recruitment Request**: Richiesta aziendale.
-- **Assumption Headquarters**: Sede della posizione.
-- **Job Family Hiring**: Categoria del ruolo.
-- **Job Title Hiring**: Titolo del ruolo.
-- **Job Description**: Descrizione del ruolo.
-- **Candidate Profile**: Profilo ideale richiesto.
-- **Years Experience.1**: Anni di esperienza richiesti (range compatibile con Years Experience del candidato).
-- **Minimum RAL**: RAL minima prevista.
-- **Maximum RAL**: RAL massima prevista.
-- **Study Level**: Livello di studio richiesto (compatibile con Study Title).
-- **Study Area.1**: Ambito di studio richiesto (compatibile con Study Area).
-- **Linked_search_key**: Codice `RSnn.nnnn` (nn = anno di inserimento, nnnn = numero di ricerche).
+**PROCESS ATTRIBUTES:**
+
+These relate to a specific stage and change for the same candidate as they progress through the recruiting process.
+
+- **Event\_Type\_\_Val**: Type of event/process stage:
+
+  - **Initial**: Commercial note, CV Request, Contact note, Research Association.
+  - **Central**: HR interview, BM interview, Technical interview, Qualification Meeting.
+  - **Final**: Candidate notification, Sending SC to customer, Economic proposal, Notify candidate, Inadequate CV.
+
+- **Event\_Feedback**: Feedback associated with the event (OK or KO, with possible comments).
+- **Overall**: Interview score (only for central events).
+- **Akkodis Headquarters**: Akkodis office handling the candidate.
+- Scores assigned by the recruiter (1–4) during the interview:
+
+  - **Technical Skills**
+  - **Standing/Position**
+  - **Communication**
+  - **Dynamism**
+  - **Mobility**
+  - **English**
+
+**JOB POSITION ATTRIBUTES:**
+
+These fields are present only if the candidate was hired by the company in question.
+
+- **Recruitment Request**: Company request.
+- **Assumption Headquarters**: Office location of the position.
+- **Job Family Hiring**: Job category.
+- **Job Title Hiring**: Job title.
+- **Job Description**: Role description.
+- **Candidate Profile**: Ideal profile required.
+- **Years Experience.1**: Required years of experience (range compatible with the candidate’s Years Experience).
+- **Minimum RAL**: Minimum expected salary.
+- **Maximum RAL**: Maximum expected salary.
+- **Study Level**: Required education level (compatible with Study Title).
+- **Study Area.1**: Required field of study (compatible with Study Area).
+- **Linked\_search\_key**: Code `RSnn.nnnn` (nn = insertion year, nnnn = search number).
 
 1. Data Cleaning
 -----------------
-Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non desiderate, e applichiamo il remapping definito nel file di configurazione.
+We load the dataset, remove duplicates, unnecessary columns, undesired rows, and apply the remapping defined in the configuration file.
 
 .. code-block:: python
 
@@ -152,23 +159,23 @@ Carichiamo il dataset, rimuoviamo i duplicati, colonne inutili, righe non deside
 
 **Target Selection**
 
-L’obiettivo del progetto è lo sviluppo di modelli di AI da impiegare nelle fasi preliminari del processo di recruiting per analizzare i bias emergenti. La scelta del target è stata influenzata dalla struttura del dataset, che contiene informazioni sui candidati e sulle posizioni gestite da Akkodis.
-In base ai dati disponibili, sono stati identificati due possibili obiettivi di predizione automatica:
+The project’s objective is to develop AI models to be used in the preliminary stages of the recruiting process to analyze emerging biases. The choice of target was influenced by the dataset structure, which contains information on candidates and positions managed by Akkodis.
+Based on available data, two possible automatic prediction targets were identified:
 
 - **RAL**
-    Predire la RAL più adeguata al profilo del candidato.
+    Predict the most appropriate salary for the candidate’s profile.
 - **Status**
-    Etichettare la coppia candidato-posizione come positiva o negativa, definendo se il profilo del candidato sia adeguato alle richieste aziendali.
-    In particolare, un candidato viene considerato Positive se risulta in una delle situazioni seguenti:
+    Label the candidate-position pair as positive or negative, defining whether the candidate’s profile meets the company’s requirements.
+    Specifically, a candidate is considered Positive if they meet one of the following situations:
     
-    - Il suo Candidate State indica che è stato assunto (Hired), ha ricevuto un’offerta economica (Economic proposal) oppure è arrivato al Qualification Meeting (QM), fase chiave di valutazione avanzata.
-    - Il suo ultimo Event_Feedback riporta un riscontro positivo, come un feedback tecnico in diretta (OK (live)), la conferma dell’inizio imminente dell’attività (OK (waiting for departure)) o la conferma esplicita di assunzione (OK (hired)).
-    - In qualsiasi altro caso, il profilo viene etichettato Negative, segnalando che non ha soddisfatto i requisiti aziendali a livelli decisionali rilevanti.
+    - Their Candidate State indicates they have been hired (Hired), received an economic offer (Economic proposal), or reached the Qualification Meeting (QM), a key evaluation phase.
+    - Their latest Event_Feedback reports positive feedback, such as a live technical feedback (OK (live)), confirmation of imminent start of activity (OK (waiting for departure)), or explicit hiring confirmation (OK (hired)).
+    - In any other case, the profile is labeled Negative, indicating it did not satisfy the company’s requirements at relevant decision-making levels.
 
-La prima ipotesi è stata scartata poiché oltre il 90% dei candidati non presenta valori per i campi relativi alla RAL.
-Per distinguere tra candidati idonei e non idonei, è necessario definire una variabile target esplicita, tuttavia il dataset originale non contiene una colonna binaria per questo scopo.
-Pertanto è stata creata la variabile Status, derivata logicamente, in base ai criteri appena mostrati, dalle colonne Candidate State ed Event_Feedback.
-Questa scelta è coerente con l’obiettivo di valutare se i modelli di classificazione rispettino criteri di equità nel processo decisionale di assunzione.
+The first hypothesis was discarded because over 90% of candidates do not have values for the RAL-related fields.
+To distinguish between suitable and unsuitable candidates, it was necessary to define an explicit target variable; however, the original dataset does not contain a binary column for this purpose.
+Therefore, the Status variable was created logically, based on the criteria just shown, from the Candidate State and Event_Feedback columns.
+This choice is consistent with the goal of evaluating whether classification models respect fairness criteria in the hiring decision process.
 
 .. code-block:: python
 
@@ -230,7 +237,7 @@ Questa scelta è coerente con l’obiettivo di valutare se i modelli di classifi
 
 .. code-block:: python
 
-    cols = 2  # numero di colonne nella griglia
+    cols = 2
     n = len(config['visualize_columns'])
     rows = math.ceil(n / cols)
 
@@ -252,7 +259,7 @@ Questa scelta è coerente con l’obiettivo di valutare se i modelli di classifi
             ax=ax
         )
         ax.set_title(lookup)
-        ax.tick_params(axis='x', rotation=45)  # se vuoi ruotare le etichette
+        ax.tick_params(axis='x', rotation=45)
 
     for j in range(i+1, len(axes)):
         axes[j].axis('off')
@@ -264,23 +271,23 @@ Questa scelta è coerente con l’obiettivo di valutare se i modelli di classifi
 
 **Sensitive Feature Selection**
 
-Nel contesto dell’analisi di equità algoritmica, le variabili considerate sensibili sono state individuate sulla base di criteri normativi (es. GDPR) e di rilevanza sociale, con l’obiettivo di monitorarne l’impatto sui tassi di assunzione e prevenire possibili discriminazioni. In particolare, sono state studiate le seguenti caratteristiche protette:
+In the context of algorithmic fairness analysis, sensitive variables were identified based on regulatory criteria (e.g., GDPR) and social relevance, with the aim of monitoring their impact on hiring rates and preventing potential discrimination. In particular, the following protected characteristics were studied:
 
-- **Sesso (Gender)**
-    Il dataset presenta una marcata sottorappresentazione delle candidate di sesso femminile (20% del totale). Tuttavia, il tasso di assunzione delle donne risulta superiore a quello degli uomini: l’8,3% contro il 5,3%. Questa differenza potrebbe riflettere una scelta organizzativa volta a incrementare la diversità di genere, oppure la maggiore qualificazione dei profili femminili.
-- **Fascia di età (Age Range)**
-    Più del 65% dei candidati ha meno di 30 anni, di cui il 17% addirittura sotto i 20. Tuttavia, i tassi di assunzione crescono nelle fasce più mature, con un picco tra 31 e 45 anni, a conferma di una preferenza verso professionisti con maggiore esperienza. I candidati più giovani (≤ 26 anni) mostrano performance di assunzione complessivamente inferiori.
-- **Residenza italiana**
-    I candidati con residenza in Italia mostrano una probabilità di assunzione più elevata, probabilmente a causa di fattori logistici, vincoli normativi e della presenza di uffici locali.
-    Tuttavia, il numero di non residenti nel nostro campione è esiguo, rendendo impossibile trarre conclusioni significative sul loro tasso di assunzione. Durante la fase successiva di raccolta dati, sarà dunque essenziale aumentare la rappresentatività di questo gruppo per analizzare eventuali disparità.
-- **Categoria protetta (Protected Category)**
-    Gli appartenenti alle categorie protette costituiscono solo lo 0,6 % del campione (18 candidati), un’incidenza troppo bassa per consentire valutazioni statistiche affidabili sul loro esito di selezione. Per stabilire se esistano discriminazioni o differenze sostanziali, anche in questo caso risulta fondamentale aumentare la rappresentatività del gruppo per effettuare una analisi adeguata sulle possibili disparità.
+- **Gender**  
+    The dataset shows a marked underrepresentation of female candidates (20% of the total). However, the hiring rate for women is higher than for men: 8.3% versus 5.3%. This difference could reflect an organizational choice aimed at increasing gender diversity, or the higher qualification of female profiles.
+- **Age Range**  
+    More than 65% of candidates are under 30 years old, of which 17% are even under 20. However, hiring rates increase in more mature age ranges, peaking between 31 and 45 years, confirming a preference for professionals with more experience. Younger candidates (≤ 26 years) show overall lower hiring performance.
+- **Italian Residence**  
+    Candidates residing in Italy have a higher probability of being hired, likely due to logistical factors, regulatory constraints, and the presence of local offices.
+    However, the number of non-residents in our sample is small, making it impossible to draw meaningful conclusions about their hiring rate. During the next data collection phase, it will therefore be essential to increase the representativeness of this group to analyze potential disparities.
+- **Protected Category**  
+    Those belonging to protected categories constitute only 0.6% of the sample (18 candidates), an incidence too low to allow reliable statistical evaluations of their selection outcome. To determine whether there are any substantive discrimination or differences, it is also essential in this case to increase the representativeness of the group in order to perform an adequate analysis of possible disparities.
 
-Il passo successivo consisterà nell’integrare queste valutazioni all’interno del flusso di sviluppo del modello di selezione, applicando metriche di fairness e strumenti di mitigazione per garantire un processo di assunzione equo e trasparente.
+The next step will consist of integrating these evaluations within the selection model development flow, applying fairness metrics and mitigation tools to ensure an equitable and transparent hiring process.
 
 .. code-block:: python
 
-    cols = 2  # numero di colonne nella griglia
+    cols = 2
     n = len(config['sensitive_columns'])
     total_plots = n * 2
     rows = math.ceil(total_plots / cols)
@@ -339,7 +346,7 @@ Il passo successivo consisterà nell’integrare queste valutazioni all’intern
 
 **Cross-Correlation Analysis**
 
-Per evidenziare le relazioni tra le colonne del dataset e ottenere una rappresentazione grafica riassuntiva è stata generata una matrice di correlazione, utilizzando la funzione heatmap di Seaborn
+To highlight the relationships between the dataset’s columns and obtain a concise graphical representation, a correlation matrix was generated using Seaborn’s heatmap function.
 
 .. code-block:: python
 
@@ -421,7 +428,7 @@ Per evidenziare le relazioni tra le colonne del dataset e ottenere una rappresen
 
 **Chi-squared Test Analysis**
 
-Per identificare le variabili categoriche che potrebbero essere considerate proxy per le feature sensibili, è stata effettuata un’analisi basata sul test del chi-squared.
+To identify the categorical variables that could be considered proxies for sensitive features, an analysis based on the chi-squared test was performed.
 
 .. code-block:: python
 
@@ -468,7 +475,6 @@ Per identificare le variabili categoriche che potrebbero essere considerate prox
         })
     res_df = pd.DataFrame(results)
 
-    # Correzione Bonferroni su tutti i p_raw
     reject, p_bonf, _, _ = multipletests(res_df['p_raw'], method='bonferroni')
     res_df['p_bonf']      = p_bonf
     res_df['significant'] = reject
@@ -500,12 +506,12 @@ Per identificare le variabili categoriche che potrebbero essere considerate prox
 
 2.3 Bias Detection
 ~~~~~~~~~~~~~~~~~~
-Per valutare il livello di Fairness dei modelli addestrati sono state scelte tre metriche: 
+To evaluate the level of Fairness of the trained models, three metrics were chosen:
 
-- **Demographic Parity**
-    Questa metrica richiede che ciascun gruppo abbia le stesse opportunità di essere assegnato alla classe positiva, indipendentemente da veri o falsi positivi. Un modello accurato potrebbe risultare unfair se i sottogruppi nel test set sono sbilanciati rispetto alla variabile target Status.
-- **Equalized Odds**
-    Questa metrica garantisce che i tassi di True Positive Rate (TPR) e False Positive Rate (FPR) siano costanti tra i diversi gruppi. Significa che il modello dovrebbe classificare erroneamente candidati non idonei come positivi con uguale probabilità per tutte le categorie, evitando di favorire o penalizzare un particolare sottoinsieme.
+* **Demographic Parity**
+  This metric requires that each group have the same opportunity to be assigned to the positive class, regardless of true or false positives. An accurate model could turn out unfair if the subgroups in the test set are imbalanced with respect to the target variable Status.
+* **Equalized Odds**
+  This metric guarantees that the True Positive Rate (TPR) and False Positive Rate (FPR) remain constant across different groups. It means that the model should misclassify unqualified candidates as positive with equal probability for all categories, avoiding favoring or penalizing any particular subset.
 
 .. code-block:: python
 
@@ -535,7 +541,6 @@ Per valutare il livello di Fairness dei modelli addestrati sono state scelte tre
         dir = sr_by_group.min() / sr_by_group.max()
         did = sr_by_group.max() - sr_by_group.min()
 
-        # Plot dei 4 valori
         metrics = [dpr, dpd, dir, did]
         labels = ['Statistical Parity Ratio',
                 'Statistical Parity Difference',
@@ -613,21 +618,27 @@ Per valutare il livello di Fairness dei modelli addestrati sono state scelte tre
     
 **Models**
 
-Per  garantire  una  panoramica  complessiva  sono  stati  selezionati  modelli  appartenenti  a 
-famiglie  algoritmiche  diverse,  includendo  modelli  lineari,  probabilistici,  ad  albero  e  reti 
-neurali. L’obiettivo è confrontare i risultati e mettere in relazione performance e fairness. 
-I modelli selezionati includono: 
+To ensure a comprehensive overview, models belonging to different algorithmic families were selected, including linear, probabilistic, tree-based, and neural network models.
+The objective is to compare the results and relate performance to fairness. The selected models include:
 
-- **Modelli Lineari** 
-    - Linear Regression 
-    - Logistic Regression 
-- **Modelli Probabilistici** 
-    - Gaussian Naïve Bayes 
-- **Modelli Tree-based** 
-    - Decision Tree
-- **Modelli Distance-based** 
-    - K-Nearest Neighbors 
-- **Rete Neurale**
+* **Linear Models**
+
+  * Linear Regression
+  * Logistic Regression
+
+* **Probabilistic Models**
+
+  * Gaussian Naïve Bayes
+
+* **Tree-based Models**
+
+  * Decision Tree
+
+* **Distance-based Models**
+
+  * K-Nearest Neighbors
+
+* **Neural Network**
 
 
 3.1 No Mitigation - Baseline
@@ -1128,7 +1139,7 @@ I modelli selezionati includono:
     group_agg = (
         group_metrics
         .groupby(['Model','Metric'])[['mean','std']]
-        .mean()                 # media dei mean e media degli std
+        .mean()
         .reset_index()
     )
 
@@ -1167,35 +1178,36 @@ I modelli selezionati includono:
 .. image:: _static/fairness.png
 
 
-**Commento Finale sui Risultati di Fairness**
+**Final Commentary on Fairness Results**
 
-L’analisi comparativa delle tre strategie di mitigazione (pre-processing CorrelationRemover, in-processing GerryFairClassifier e post-processing ThresholdOptimizer) applicate sui sette modelli evidenzia chiaramente i seguenti punti:
-
+The comparative analysis of the three mitigation strategies (pre-processing with CorrelationRemover, in-processing with GerryFairClassifier and post-processing with ThresholdOptimizer) applied to the seven models clearly highlights the following points:
 
 1. **Pre-processing (CorrelationRemover)**
 
-   * Garantisce un miglior compromesso: migliora in modo costante la **Demographic Parity difference** e la **Equalized Odds Difference** senza impatti troppo drastici su *False Negative Rate*/*False Positive Rate*, quindi mantenendo performance di classificazione simili al modello baseline.
+   * Ensures a better compromise: it consistently improves the **Demographic Parity difference** and the **Equalized Odds Difference** without overly drastic impacts on *False Negative Rate*/*False Positive Rate*, thus maintaining classification performance similar to the baseline model.
 
 2. **In-processing (GerryFairClassifier)**
 
-   * Applicato qui solo su Linear Regression, offre benefici intermedi tra pre-processing e post-processing: riduce abbastanza bene **Demographic Parity difference** ma è meno incisivo su **Equalized Odds Difference**, e l’overhead di complessità del metodo è maggiore.
+   * Applied here only to Linear Regression, it offers intermediate benefits between pre-processing and post-processing: it reduces the **Demographic Parity difference** quite well but is less effective on the **Equalized Odds Difference**, and the method’s complexity overhead is higher.
 
 3. **Post-processing (ThresholdOptimizer)**
 
-   * È la leva più efficace nel ridurre sia la **Demographic Parity difference** che la **Equalized Odds Difference**, avvicinando i loro valori a zero in quasi tutti i modelli.
-   * Tuttavia, questo “effetto di livellamento” si ottiene a costo di un leggero peggioramento nei tassi di errore assoluti (*False Negative Rate*/*False Positive Rate*) e in alcune variazioni del tasso di selezione complessivo.
+   * It is the most effective lever for reducing both the **Demographic Parity difference** and the **Equalized Odds Difference**, bringing their values close to zero in almost all models.
+   * However, this “flattening effect” is achieved at the cost of a slight worsening in absolute error rates (*False Negative Rate*/*False Positive Rate*) and some variation in the overall selection rate.
 
-4. **Robustezza dei modelli**
+4. **Model Robustness**
 
-   * **XGBoost** e **Naïve Bayes** partono da valori di disparità già più contenuti e subiscono minori aggiustamenti, risultando i più “intrinsecamente equi” sui dati testati.
-   * **Decision Tree** e **KNN** mostrano i maggiori guadagni di fairness (e parallelamente i maggiori trade-off in termini di errori), confermando che la scelta del modello incide sensibilmente sull’efficacia di ogni strategia.
+   * **XGBoost** and **Naïve Bayes** start from lower disparity values and undergo smaller adjustments, making them the most “intrinsically fair” on the tested data.
+   * **Decision Tree** and **KNN** show the greatest fairness gains (and, correspondingly, the greatest trade-offs in error rates).
+   
+   Both of these findings confirm that the choice of model significantly influences the effectiveness of each mitigation strategy.
 
-5. **Scelta Operativa**
+5. **Operational Choice**
 
-   * Se l’obiettivo primario è **massimizzare la fairness**, la post-processing è la prima scelta.
-   * Se invece si desidera un bilanciamento più delicato tra fairness e accuratezza, la pre-processing consente di “smussare” i bias senza compromettere eccessivamente le prestazioni.
+   * If the primary objective is to **maximize fairness**, post-processing should be the first choice.
+   * If instead you desire a more delicate **balance between fairness and accuracy**, pre-processing allows you to “smooth out” biases without excessively compromising performance.
 
-In conclusione, l’integrazione di queste evidenze nel flusso di produzione dei modelli permette di selezionare la strategia di mitigazione più adatta agli obiettivi aziendali, bilanciando equità, trasparenza e performance predittiva.
+In conclusion, integrating these insights into the model production workflow enables the selection of the mitigation strategy best suited to business objectives, balancing fairness, transparency, and predictive performance.
 
 .. raw:: html
 
@@ -1205,11 +1217,11 @@ In conclusione, l’integrazione di queste evidenze nel flusso di produzione dei
 
    <div style="width:1500px;">
 
-.. list-table:: Analisi delle strategie di fairness
+.. list-table:: Fairness Strategies Analysis
    :header-rows: 1
    :widths: 1 1 1 1 1 1 1 1
 
-   * - Tecnica \ Modello
+   * - Technique / Model
      - Decision Tree
      - KNN
      - Linear Regression
@@ -1217,33 +1229,30 @@ In conclusione, l’integrazione di queste evidenze nel flusso di produzione dei
      - Naive Bayes
      - Neural Network
      - XGBoost
-
    * - Pre-processing
-     - Migliora la **Demographic Parity**, ma complica un po’ gli errori (*FPR*/*FNR*) e gap di **Equalized Odds**.
-     - Leggero peggioramento di **Demographic Parity** e **Equalized Odds**; errori pressoché stabili.
-     - **Demographic Parity** più bilanciata; **Equalized Odds** e tassi di errore simili o in lieve calo.
-     - Piccoli guadagni sulla **Demographic Parity**, ma gap di **Equalized Odds** e *FPR*/*FNR* in lieve aumento.
-     - Fairness generale peggiore; basti guardare il consistente aumento di *FPR*.
-     - **Demographic Parity** ed **Equalized Odds** peggiorano; errori aumentano lievemente.
-     - **Demographic Parity** stabile; **Equalized Odds** stazionario; *FNR* in calo, *FPR* in lieve crescita.
-
+     - Improves **Demographic Parity** and **Equalized Odds**; *FNR* increases and *FPR* increases.
+     - **Demographic Parity** mixed; **Equalized Odds** mixed; *FNR* increases and *FPR* increases.
+     - **Demographic Parity** improves; **Equalized Odds** mixed; *FNR* decreases and *FPR* decreases.
+     - **Demographic Parity** mixed; **Equalized Odds** improves; *FNR* increases and *FPR* increases.
+     - **Demographic Parity** mixed; **Equalized Odds** mixed; *FNR* decreases and *FPR* increases significantly.
+     - **Demographic Parity** worsens; **Equalized Odds** worsens; *FNR* increases and *FPR* increases.
+     - **Demographic Parity** worsens; **Equalized Odds** mixed; *FNR* decreases and *FPR* decreases.
    * - In-processing
-     - —  
-     - —  
-     - Offre il miglior bilanciamento tra **Demographic Parity** e **Equalized Odds**, con errori contenuti.
-     - —  
-     - —  
-     - —  
-     - —  
-
+     - —
+     - —
+     - Offers no clear improvement in **Demographic Parity** or **Equalized Odds**; *FNR* and *FPR* stable.
+     - —
+     - —
+     - —
+     - —
    * - Post-processing
-     - **Demographic Parity** ulteriormente migliorata; errori (*FPR*/*FNR*) un po’ più alti.
-     - **Demographic Parity** mista; **Equalized Odds** peggiora; errori in lieve aumento.
-     - **Demographic Parity** molto più uniforme; **Equalized Odds** e errori ridotti; selection rate stabile.
-     - **Demographic Parity** e **Equalized Odds** migliorati; *FPR* diminuito; leggeri aumenti di *FNR*.
-     - **Demographic Parity** marginalmente migliorata; **Equalized Odds** peggiora; errori in aumento.
-     - **Demographic Parity** ed **Equalized Odds** leggermente peggiori; selection rate in calo.
-     - Buon compromesso: **Demographic Parity** e **Equalized Odds** più uniformi, errori stabili.
+     - Improves **Demographic Parity** and **Equalized Odds**; *FNR* increases and *FPR* decreases.
+     - **Demographic Parity** mixed; **Equalized Odds** mixed; *FNR* decreases and *FPR* increases.
+     - **Demographic Parity** improves; **Equalized Odds** improves; *FNR* decreases and *FPR* decreases.
+     - **Demographic Parity** improves; **Equalized Odds** improves; *FNR* increases and *FPR* increases.
+     - **Demographic Parity** mixed; **Equalized Odds** mixed; *FNR* increases and *FPR* increases.
+     - **Demographic Parity** worsens; **Equalized Odds** worsens; *FNR* increases and *FPR* increases.
+     - Improves **Demographic Parity**; **Equalized Odds** stable; *FNR* increases and *FPR* decreases.
 
 .. raw:: html
 
